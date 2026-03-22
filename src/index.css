@@ -5,14 +5,14 @@
   --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --color-primary: #6366f1;
   --color-primary-dark: #4f46e5;
-  --color-bg: #0f0f23;
-  --color-bg-card: #1a1a2e;
-  --color-bg-input: #16213e;
-  --color-text: #e2e8f0;
-  --color-text-muted: #94a3b8;
-  --color-accent: #a78bfa;
-  --color-gold: #fbbf24;
-  --color-border: #2d2d44;
+  --color-bg: #ffffff;
+  --color-bg-card: #f8f7ff;
+  --color-bg-input: #f1f0fb;
+  --color-text: #1e1b3a;
+  --color-text-muted: #6b7280;
+  --color-accent: #7c3aed;
+  --color-gold: #b45309;
+  --color-border: #e5e3f1;
 }
 
 body {
