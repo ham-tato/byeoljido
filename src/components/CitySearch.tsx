@@ -29,32 +29,36 @@ export default function CitySearch({ value, onChange }: Props) {
     setQuery(q)
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
-    if (q.length < 2) {
+    if (q.length < 1) {
       setResults([])
+      setIsOpen(false)
       return
     }
 
-    // 한국 도시 먼저 필터
+    // 한국 도시 즉시 필터 (한 글자부터)
     const koreanMatches = KOREAN_CITIES.filter(c => c.name.includes(q))
-    if (koreanMatches.length > 0) {
-      setResults(koreanMatches)
-      setIsOpen(true)
-    }
+    setResults(koreanMatches)
+    if (koreanMatches.length > 0) setIsOpen(true)
 
-    // GeoNames 검색 (디바운스)
-    timeoutRef.current = setTimeout(async () => {
-      setIsSearching(true)
-      const apiResults = await searchCities(q)
-      // 한국 도시 중복 제거
-      const koreanNames = new Set(KOREAN_CITIES.map(c => c.name))
-      const filtered = apiResults.filter(c => !koreanNames.has(c.name) || c.country !== '대한민국')
-      setResults(prev => {
-        const combined = [...prev.filter(c => c.country === '대한민국'), ...filtered]
-        return combined.slice(0, 15)
-      })
-      setIsOpen(true)
-      setIsSearching(false)
-    }, 400)
+    // 2글자 이상이면 해외 도시도 검색 (디바운스)
+    if (q.length >= 2) {
+      timeoutRef.current = setTimeout(async () => {
+        setIsSearching(true)
+        const apiResults = await searchCities(q)
+        // 이름+국가 기준 중복 제거
+        const seen = new Set(KOREAN_CITIES.filter(c => c.name.includes(q)).map(c => `${c.name}|${c.country}`))
+        const filtered = apiResults.filter(c => {
+          const key = `${c.name}|${c.country}`
+          if (seen.has(key)) return false
+          seen.add(key)
+          return true
+        })
+        const korean = KOREAN_CITIES.filter(c => c.name.includes(q))
+        setResults([...korean, ...filtered].slice(0, 15))
+        setIsOpen(true)
+        setIsSearching(false)
+      }, 400)
+    }
   }
 
   function selectCity(city: City) {
@@ -91,7 +95,7 @@ export default function CitySearch({ value, onChange }: Props) {
         value={query}
         onChange={e => handleQueryChange(e.target.value)}
         onFocus={() => query.length >= 2 && setIsOpen(true)}
-        placeholder="도시명으로 검색 (예: Tokyo, New York)"
+        placeholder="도시명 검색 (예: 파주, Tokyo, New York)"
         className="w-full px-4 py-3 bg-bg-input border border-border rounded-lg text-text placeholder:text-text-muted/50 focus:outline-none focus:border-primary transition-colors"
       />
 

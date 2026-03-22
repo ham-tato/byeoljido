@@ -29,25 +29,53 @@ export const KOREAN_CITIES: City[] = [
   { name: '경주', country: '대한민국', lat: 35.8562, lng: 129.2249, timezone: 'Asia/Seoul' },
   { name: '강릉', country: '대한민국', lat: 37.7519, lng: 128.8761, timezone: 'Asia/Seoul' },
   { name: '속초', country: '대한민국', lat: 38.207, lng: 128.5918, timezone: 'Asia/Seoul' },
+  { name: '파주', country: '대한민국', lat: 37.7599, lng: 126.7801, timezone: 'Asia/Seoul' },
+  { name: '김포', country: '대한민국', lat: 37.6153, lng: 126.7156, timezone: 'Asia/Seoul' },
+  { name: '화성', country: '대한민국', lat: 37.1996, lng: 126.8312, timezone: 'Asia/Seoul' },
+  { name: '양주', country: '대한민국', lat: 37.7853, lng: 127.0457, timezone: 'Asia/Seoul' },
+  { name: '구미', country: '대한민국', lat: 36.1195, lng: 128.3446, timezone: 'Asia/Seoul' },
+  { name: '진주', country: '대한민국', lat: 35.1802, lng: 128.1076, timezone: 'Asia/Seoul' },
+  { name: '양산', country: '대한민국', lat: 35.335, lng: 129.0373, timezone: 'Asia/Seoul' },
+  { name: '광명', country: '대한민국', lat: 37.4786, lng: 126.8644, timezone: 'Asia/Seoul' },
+  { name: '시흥', country: '대한민국', lat: 37.3803, lng: 126.8029, timezone: 'Asia/Seoul' },
+  { name: '군포', country: '대한민국', lat: 37.3614, lng: 126.935, timezone: 'Asia/Seoul' },
+  { name: '안양', country: '대한민국', lat: 37.3943, lng: 126.9568, timezone: 'Asia/Seoul' },
+  { name: '의정부', country: '대한민국', lat: 37.7381, lng: 127.0337, timezone: 'Asia/Seoul' },
+  { name: '남양주', country: '대한민국', lat: 37.636, lng: 127.2165, timezone: 'Asia/Seoul' },
+  { name: '하남', country: '대한민국', lat: 37.5393, lng: 127.2148, timezone: 'Asia/Seoul' },
+  { name: '이천', country: '대한민국', lat: 37.2719, lng: 127.4351, timezone: 'Asia/Seoul' },
+  { name: '세종', country: '대한민국', lat: 36.48, lng: 127.2589, timezone: 'Asia/Seoul' },
+  { name: '익산', country: '대한민국', lat: 35.9483, lng: 126.9577, timezone: 'Asia/Seoul' },
+  { name: '군산', country: '대한민국', lat: 35.9676, lng: 126.7369, timezone: 'Asia/Seoul' },
+  { name: '거제', country: '대한민국', lat: 34.8806, lng: 128.6211, timezone: 'Asia/Seoul' },
+  { name: '통영', country: '대한민국', lat: 34.8544, lng: 128.4331, timezone: 'Asia/Seoul' },
+  { name: '서귀포', country: '대한민국', lat: 33.2541, lng: 126.56, timezone: 'Asia/Seoul' },
 ]
 
-// GeoNames API를 사용한 전세계 도시 검색
+// OpenStreetMap Nominatim API를 사용한 전세계 도시 검색 (인증 불필요)
 export async function searchCities(query: string): Promise<City[]> {
   if (!query || query.length < 2) return []
 
   try {
     const res = await fetch(
-      `https://secure.geonames.org/searchJSON?q=${encodeURIComponent(query)}&maxRows=10&featureClass=P&lang=ko&username=byeoljido`
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=10&accept-language=ko&featuretype=city`,
+      { headers: { 'User-Agent': 'byeoljido-app' } }
     )
     const data = await res.json()
 
-    return (data.geonames || []).map((g: Record<string, string | number>) => ({
-      name: g.name as string,
-      country: g.countryName as string,
-      lat: Number(g.lat),
-      lng: Number(g.lng),
-      timezone: (g.timezone as unknown as { timeZoneId: string })?.timeZoneId || 'UTC',
-    }))
+    return (data || [])
+      .filter((g: Record<string, string>) => g.type === 'city' || g.type === 'town' || g.type === 'village' || g.type === 'administrative')
+      .map((g: Record<string, string>) => {
+        const parts = (g.display_name || '').split(', ')
+        const country = parts[parts.length - 1] || ''
+        return {
+          name: g.name || parts[0] || '',
+          country,
+          lat: Number(g.lat),
+          lng: Number(g.lon),
+          timezone: 'UTC', // Nominatim doesn't provide timezone
+        }
+      })
   } catch {
     return []
   }

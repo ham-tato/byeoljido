@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useChartStore } from '@/stores/chartStore'
 import { generateReading } from '@/lib/generateReading'
 import type { ReadingSection } from '@/lib/generateReading'
+import charResult from '@/assets/char-result.png'
 
 const SECTION_LABELS: Record<string, string> = {
   appearance: '(1)',
@@ -62,10 +63,17 @@ export default function Result() {
 
   return (
     <div className="min-h-screen">
-      {/* 헤더 */}
-      <div className="text-center pt-12 pb-8 px-4">
+      {/* 헤더 + 캐릭터 */}
+      <div className="text-center pt-10 pb-6 px-4">
+        <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-gold/40 shadow-lg shadow-gold/10 mb-4">
+          <img
+            src={charResult}
+            alt="결과를 안내하는 점성술사"
+            className="w-full h-full object-cover object-top"
+          />
+        </div>
         <p className="text-accent text-sm mb-2">
-          {input.year}년 {input.month}월 {input.day}일 {input.hour}시 {input.minute}분 · {input.city.name}
+          {input.year}년 {input.month}월 {input.day}일 {input.hour}시 {input.minute}분 &middot; {input.city.name}
         </p>
         <h1 className="text-2xl font-bold text-text mb-1">{input.nickname}님의 별지도</h1>
         <p className="text-text-muted text-sm">당신이 태어나던 순간의 하늘</p>

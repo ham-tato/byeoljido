@@ -4,18 +4,31 @@ import { useChartStore } from '@/stores/chartStore'
 import { calculateChart } from '@/lib/astro'
 import CitySearch from '@/components/CitySearch'
 import type { City } from '@/stores/chartStore'
+import charLoading from '@/assets/char-loading.png'
+
+function loadFormDraft() {
+  try {
+    const d = localStorage.getItem('byeoljido_form')
+    return d ? JSON.parse(d) : null
+  } catch { return null }
+}
+
+function saveFormDraft(data: Record<string, unknown>) {
+  try { localStorage.setItem('byeoljido_form', JSON.stringify(data)) } catch {}
+}
 
 export default function InputForm() {
   const navigate = useNavigate()
   const { setInput, setChart } = useChartStore()
+  const draft = loadFormDraft()
 
-  const [nickname, setNickname] = useState('')
-  const [year, setYear] = useState('')
-  const [month, setMonth] = useState('')
-  const [day, setDay] = useState('')
-  const [hour, setHour] = useState('')
-  const [minute, setMinute] = useState('')
-  const [city, setCity] = useState<City | null>(null)
+  const [nickname, setNickname] = useState(draft?.nickname || '')
+  const [year, setYear] = useState(draft?.year || '')
+  const [month, setMonth] = useState(draft?.month || '')
+  const [day, setDay] = useState(draft?.day || '')
+  const [hour, setHour] = useState(draft?.hour || '')
+  const [minute, setMinute] = useState(draft?.minute || '')
+  const [city, setCity] = useState<City | null>(draft?.city || null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -42,31 +55,59 @@ export default function InputForm() {
     setIsLoading(true)
     setError('')
 
-    try {
-      const input = {
-        nickname: nickname.trim(),
-        year: parseInt(year),
-        month: parseInt(month),
-        day: parseInt(day),
-        hour: parseInt(hour),
-        minute: parseInt(minute),
-        city: city!,
+    // 폼 입력값 저장
+    saveFormDraft({ nickname, year, month, day, hour, minute, city })
+
+    // 로딩 연출을 위해 약간의 딜레이
+    setTimeout(() => {
+      try {
+        const input = {
+          nickname: nickname.trim(),
+          year: parseInt(year),
+          month: parseInt(month),
+          day: parseInt(day),
+          hour: parseInt(hour),
+          minute: parseInt(minute),
+          city: city!,
+        }
+
+        const chart = calculateChart(
+          input.year, input.month, input.day,
+          input.hour, input.minute,
+          input.city.lat, input.city.lng,
+        )
+
+        setInput(input)
+        setChart(chart)
+        navigate('/result')
+      } catch (err) {
+        console.error('Chart calculation error:', err)
+        setError('차트 계산 중 오류가 발생했습니다. 입력 정보를 확인해주세요.')
+        setIsLoading(false)
       }
+    }, 2000)
+  }
 
-      const chart = calculateChart(
-        input.year, input.month, input.day,
-        input.hour, input.minute,
-        input.city.lat, input.city.lng,
-      )
-
-      setInput(input)
-      setChart(chart)
-      navigate('/result')
-    } catch {
-      setError('차트 계산 중 오류가 발생했습니다. 입력 정보를 확인해주세요.')
-    } finally {
-      setIsLoading(false)
-    }
+  // 로딩 화면
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+        <div className="w-40 h-40 md:w-48 md:h-48 mx-auto rounded-full overflow-hidden border-2 border-accent/30 shadow-lg shadow-accent/10 mb-6 animate-pulse">
+          <img
+            src={charLoading}
+            alt="별을 분석하는 중"
+            className="w-full h-full object-cover object-top"
+          />
+        </div>
+        <p className="text-accent font-medium text-lg mb-2">별을 읽고 있어요...</p>
+        <p className="text-text-muted text-sm">{nickname}님이 태어나던 순간의 하늘을 복원하고 있습니다</p>
+        <div className="mt-6 flex gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2 h-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-2 h-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '300ms' }} />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -163,7 +204,7 @@ export default function InputForm() {
             disabled={isLoading}
             className="w-full py-3.5 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-medium rounded-lg transition-colors cursor-pointer"
           >
-            {isLoading ? '별을 읽고 있어요...' : '내 별지도 보기'}
+            내 별지도 보기
           </button>
         </form>
       </div>

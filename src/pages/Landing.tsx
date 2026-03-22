@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import charLanding from '@/assets/char-landing.png'
 
 export default function Landing() {
   const navigate = useNavigate()
@@ -7,10 +8,23 @@ export default function Landing() {
     <div className="min-h-screen flex flex-col">
       {/* Hero */}
       <section className="flex-1 flex flex-col items-center justify-center px-4 text-center">
-        <div className="mb-6">
-          <div className="text-5xl mb-4" role="img" aria-label="stars">
-            &#10024;
+        {/* 캐릭터 */}
+        <div className="mb-6 relative">
+          <div className="w-52 h-52 md:w-64 md:h-64 mx-auto rounded-full overflow-hidden border-2 border-accent/30 shadow-lg shadow-accent/10">
+            <img
+              src={charLanding}
+              alt="별지도 점성술사"
+              className="w-full h-full object-cover object-top"
+            />
           </div>
+          {/* 말풍선 */}
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bg-card border border-border rounded-2xl px-4 py-2 shadow-lg whitespace-nowrap">
+            <p className="text-sm text-accent font-medium">당신의 별을 읽어드릴게요</p>
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-bg-card border-l border-t border-border rotate-45" />
+          </div>
+        </div>
+
+        <div className="mt-10 mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-text mb-3 leading-tight">
             당신이 태어나던 순간,<br />하늘은 어떤 그림을<br />그리고 있었을까요?
           </h1>
@@ -27,7 +41,7 @@ export default function Landing() {
           내 별지도 보기
         </button>
 
-        <p className="text-text-muted/60 text-xs mt-4">1,900원 · 평생 열람 가능</p>
+        <p className="text-text-muted/60 text-xs mt-4">1,900원 &middot; 평생 열람 가능</p>
       </section>
 
       {/* 특징 */}

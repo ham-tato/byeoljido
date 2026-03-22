@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { Origin, Horoscope } from 'circular-natal-horoscope-js'
+import horoscopeLib from 'circular-natal-horoscope-js'
+const { Origin, Horoscope } = horoscopeLib
 import type { ChartData, PlanetPosition, Aspect } from '@/stores/chartStore'
 
 const SIGN_MAP: Record<string, string> = {
