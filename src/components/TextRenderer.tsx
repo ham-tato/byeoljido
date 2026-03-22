@@ -1,18 +1,25 @@
 import type { ReactNode } from 'react'
 
-// 강조할 패턴들: 핵심 성격 묘사, 비유, 결론적 문장의 키워드
+// 문단별 최소 1개 볼드를 보장하기 위해 넓은 기준
 const BOLD_PATTERNS = [
-  // 핵심 성격 키워드
-  /(?:타고난|숨겨진|가장 큰|가장 중요한|진정한|절대적인|궁극적인)\s*[가-힣]+/g,
-  // "~의 소유자/달인/표본/마스터" 패턴
-  /[가-힣]+(?:의 소유자|의 달인|의 표본|의 마스터|의 아이콘|의 천재|의 귀재)/g,
-  // "~형/타입" 성격 분류
-  /(?:외유내강|워커홀릭|만개형|롤러코스터|슈퍼컴퓨터|부메랑|불사조|폭발적|압도적)[가-힣\s]*/g,
-  // 강조 부사 + 서술어
-  /(?:절대|반드시|누구보다|가장|오히려|결코)\s+[가-힣]+(?:합니다|합니다\.|입니다|입니다\.|됩니다|됩니다\.)/g,
+  // 핵심 성격 수식어 + 명사 (넓게)
+  /(?:타고난|숨겨진|가장|진정한|절대적인|궁극적인|놀라운|엄청난|강렬한|탁월한|뛰어난|독보적인|압도적인|폭발적인|무한한|극도의|남다른)\s?[가-힣]{2,}/g,
+  // "~의 ~자/인" 역할 수식
+  /[가-힣]{2,}(?:의 소유자|의 달인|의 표본|의 마스터|의 아이콘|의 천재|의 귀재|의 완성체|의 화신|의 원천|의 열쇠|의 무기)/g,
+  // 콤팩트한 성격 라벨/비유
+  /(?:외유내강|워커홀릭|만개형|롤러코스터|슈퍼컴퓨터|부메랑|불사조|해결사|팩폭러|스토리텔러|로맨티스트|탐험가|분석가|혁신가|개척자|야심가)[가-힣\s]*/g,
+  // 강조 부사 + 서술
+  /(?:절대|반드시|누구보다|오히려|결코|이것이야말로|바로 이것이)\s?[가-힣]+/g,
+  // "~할 수 있습니다/됩니다" 결론문의 핵심 동사구
+  /(?:빛을 발|진가를 발휘|두각을 나타|에너지를 얻|행운이 찾아|기회를 발견|성취를 이룰|보상으로 돌아)/g,
+  // "~한 사람/매력/능력" 특성 요약
+  /[가-힣]{2,}(?:한 매력|한 사람|한 능력|한 재능|한 강점|한 무기|한 존재|한 타입|한 성품)/g,
+  // "~적인/~스러운" 형용사 + 명사
+  /(?:현실적인|감성적인|직관적인|독립적인|창의적인|혁신적인|논리적인|본능적인|운명적인)\s?[가-힣]{1,4}/g,
+  // 문장 끝 "~입니다/~이에요/~있습니다" 앞의 핵심어 (2~6자)
+  /[가-힣]{2,6}(?=(?:입니다|이에요|있습니다|됩니다|합니다)[\.\s])/g,
 ]
 
-// **명시적 볼드** 마크다운 처리
 function parseExplicitBold(text: string): ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*)/)
   return parts.map((part, i) => {
@@ -23,21 +30,17 @@ function parseExplicitBold(text: string): ReactNode[] {
   })
 }
 
-// 자동 볼드 + 명시적 볼드 통합
 export default function TextRenderer({ text, className }: { text: string; className?: string }) {
-  // 먼저 명시적 **볼드** 처리
   if (text.includes('**')) {
     return <span className={className}>{parseExplicitBold(text)}</span>
   }
 
-  // 자동 볼드: 핵심 구절만 강조
-  let processed = text
   const boldRanges: [number, number][] = []
 
   for (const pattern of BOLD_PATTERNS) {
     let match
     const regex = new RegExp(pattern.source, pattern.flags)
-    while ((match = regex.exec(processed)) !== null) {
+    while ((match = regex.exec(text)) !== null) {
       boldRanges.push([match.index, match.index + match[0].length])
     }
   }
@@ -46,7 +49,7 @@ export default function TextRenderer({ text, className }: { text: string; classN
     return <span className={className}>{text}</span>
   }
 
-  // 겹치는 범위 병합
+  // 병합
   boldRanges.sort((a, b) => a[0] - b[0])
   const merged: [number, number][] = [boldRanges[0]]
   for (let i = 1; i < boldRanges.length; i++) {
@@ -58,7 +61,6 @@ export default function TextRenderer({ text, className }: { text: string; classN
     }
   }
 
-  // 조각 생성
   const nodes: ReactNode[] = []
   let cursor = 0
   for (const [start, end] of merged) {
