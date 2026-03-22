@@ -10,10 +10,23 @@ import { DESCENDANT_MAP, DESTINED_PARTNER } from '@/data/templates/descendant'
 import { APPEARANCE_SUBTITLE, INNER_SUBTITLE, COMMUNICATION_SUBTITLE, LOVE_SUBTITLE, CAREER_SUBTITLE, LIFE_DIRECTION_SUBTITLE, JUPITER_SUBTITLE, DESTINED_PARTNER_SUBTITLE } from '@/data/templates/subtitles'
 import { eulReul, iGa, gwaWa } from '@/lib/particles'
 
+const PLANET_SYMBOLS: Record<string, string> = {
+  '태양': '☉', '달': '☽', '수성': '☿', '금성': '♀', '화성': '♂',
+  '목성': '♃', '토성': '♄', '천왕성': '♅', '해왕성': '♆', '명왕성': '♇',
+}
+
+export interface StarBadge {
+  symbol: string  // 천문 기호
+  label: string   // 행성/포인트 이름
+  sign: string    // 별자리
+  house?: number  // 하우스
+}
+
 export interface ReadingSection {
   id: string
   title: string
   subtitle?: string
+  badges?: StarBadge[]
   starMovement: string
   body: string
 }
@@ -62,6 +75,7 @@ function generateAppearance(chart: ChartData): ReadingSection {
     id: 'appearance',
     title: '남이 보는 나',
     subtitle: APPEARANCE_SUBTITLE[ascSign],
+    badges: [{ symbol: 'ASC', label: '상승궁', sign: ascSign }],
     starMovement: `당신의 첫인상과 사회적 가면을 뜻하는 상승궁이 ${ascSign}에 위치해 있습니다.`,
     body: text,
   }
@@ -78,6 +92,7 @@ function generateInnerSelf(chart: ChartData): ReadingSection {
     id: 'inner',
     title: '나의 숨겨진 내면',
     subtitle: INNER_SUBTITLE[moon.sign],
+    badges: [{ symbol: '☽', label: '달', sign: moon.sign, house: moon.house }],
     starMovement: `무의식과 감정을 상징하는 달이 ${moon.sign}에, ${house?.description || `${moon.house}하우스에 위치해 있습니다.`}`,
     body: text,
   }
@@ -94,6 +109,7 @@ function generateCommunication(chart: ChartData): ReadingSection {
     id: 'communication',
     title: '내가 세상과 소통하는 방식',
     subtitle: COMMUNICATION_SUBTITLE[mercury.sign],
+    badges: [{ symbol: '☿', label: '수성', sign: mercury.sign, house: mercury.house }],
     starMovement: `소통과 사고방식을 뜻하는 수성이 ${mercury.sign}에, 그리고 ${house?.area || `${mercury.house}하우스`}인 ${mercury.house}하우스에 자리 잡고 있습니다.`,
     body: text,
   }
@@ -113,10 +129,16 @@ function generateStrengths(chart: ChartData): ReadingSection {
     const template = POSITIVE_ASPECTS[key]
     if (template) {
       const typeName = aspect.type === 'trine' ? '트라인(120°)' : '섹스타일(60°)'
+      const p1 = chart.planets[aspect.planet1]
+      const p2 = chart.planets[aspect.planet2]
       return {
         id: 'strengths',
         title: '빛을 발하는 장점과 나만의 매력',
         subtitle: template.title,
+        badges: [
+          { symbol: PLANET_SYMBOLS[aspect.planet1] || '★', label: aspect.planet1, sign: p1?.sign || '', house: p1?.house },
+          { symbol: PLANET_SYMBOLS[aspect.planet2] || '★', label: aspect.planet2, sign: p2?.sign || '', house: p2?.house },
+        ],
         starMovement: `${aspect.planet1}${gwaWa(aspect.planet1)} ${aspect.planet2}${iGa(aspect.planet2)} 서로를 밀어주는 아주 긍정적인 각도(${typeName})를 맺고 있습니다.`,
         body: template.body,
       }
@@ -147,10 +169,16 @@ function generateChallenges(chart: ChartData): ReadingSection {
     const template = NEGATIVE_ASPECTS[key]
     if (template) {
       const typeName = aspect.type === 'square' ? '스퀘어(90°)' : '오포지션(180°)'
+      const p1 = chart.planets[aspect.planet1]
+      const p2 = chart.planets[aspect.planet2]
       return {
         id: 'challenges',
         title: '마주해야 할 과제와 성장의 열쇠',
         subtitle: template.title,
+        badges: [
+          { symbol: PLANET_SYMBOLS[aspect.planet1] || '★', label: aspect.planet1, sign: p1?.sign || '', house: p1?.house },
+          { symbol: PLANET_SYMBOLS[aspect.planet2] || '★', label: aspect.planet2, sign: p2?.sign || '', house: p2?.house },
+        ],
         starMovement: `${aspect.planet1}${gwaWa(aspect.planet1)} ${aspect.planet2}${iGa(aspect.planet2)} 팽팽하게 대립하는 긴장의 각도(${typeName})를 맺고 있습니다.`,
         body: template.body,
       }
@@ -195,6 +223,7 @@ function generateLove(chart: ChartData): ReadingSection {
     id: 'love',
     title: '사랑과 관계의 방정식',
     subtitle: LOVE_SUBTITLE[venus.sign],
+    badges: [{ symbol: '♀', label: '금성', sign: venus.sign, house: venus.house }],
     starMovement: `연애와 관계를 주관하는 금성이 ${venus.sign}에, 그리고 ${house?.area || `${venus.house}하우스`}인 ${venus.house}하우스에 머물고 있습니다.`,
     body: text + extraText,
   }
@@ -221,6 +250,7 @@ function generateCareer(chart: ChartData): ReadingSection {
     id: 'career',
     title: '직업적 성취와 재물의 방향',
     subtitle: CAREER_SUBTITLE[mcSign],
+    badges: [{ symbol: 'MC', label: '중천', sign: mcSign }],
     starMovement: `커리어의 최고점(MC)이 ${mcSign}에 자리 잡고 있습니다.`,
     body: text + extraText,
   }
@@ -235,6 +265,7 @@ function generateLifeDirection(chart: ChartData): ReadingSection {
     id: 'lifeDirection',
     title: '삶의 흐름과 다가오는 타이밍',
     subtitle: LIFE_DIRECTION_SUBTITLE[nn.sign],
+    badges: [{ symbol: '☊', label: '북교점', sign: nn.sign, house: nn.house }],
     starMovement: `이번 생에서 반드시 나아가야 할 진화의 방향을 뜻하는 북교점이 ${nn.sign}에, 그리고 ${house?.area || `${nn.house}하우스`}인 ${nn.house}하우스에 위치하고 있습니다.`,
     body: text,
   }
@@ -251,6 +282,7 @@ function generateHiddenTalent(chart: ChartData): ReadingSection {
     id: 'hiddenTalent',
     title: '숨겨진 재능과 행운의 열쇠',
     subtitle: JUPITER_SUBTITLE[jupiter.sign],
+    badges: [{ symbol: '♃', label: '목성', sign: jupiter.sign, house: jupiter.house }],
     starMovement: `확장과 행운의 별 목성이 ${jupiter.sign}에, 그리고 ${house?.area || `${jupiter.house}하우스`}인 ${jupiter.house}하우스에 자리 잡고 있습니다.`,
     body: text,
   }
@@ -265,6 +297,7 @@ function generateDestinedPartner(chart: ChartData): ReadingSection {
     id: 'destinedPartner',
     title: '내 운명의 상대',
     subtitle: DESTINED_PARTNER_SUBTITLE[descSign],
+    badges: [{ symbol: 'DSC', label: '디센던트', sign: descSign }],
     starMovement: `당신의 관계와 파트너십을 뜻하는 디센던트(7하우스)${iGa(descSign)} ${descSign}에 위치해 있습니다. 이는 상승궁 ${ascSign}의 정반대 에너지로, 당신에게 부족한 것을 채워줄 운명의 상대를 가리킵니다.`,
     body: text,
   }

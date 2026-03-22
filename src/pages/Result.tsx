@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useChartStore } from '@/stores/chartStore'
 import { generateReading } from '@/lib/generateReading'
-import type { ReadingSection } from '@/lib/generateReading'
+import type { ReadingSection, StarBadge } from '@/lib/generateReading'
 import type { BirthInput, ChartData } from '@/stores/chartStore'
 import charResult from '@/assets/char-result.png'
 
@@ -25,6 +25,17 @@ const SECTION_ORDER = [
   'career', 'lifeDirection',
 ]
 
+function BadgeItem({ badge }: { badge: StarBadge }) {
+  return (
+    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-xs">
+      <span className="text-accent font-bold text-sm">{badge.symbol}</span>
+      <span className="text-text-muted">{badge.label}</span>
+      <span className="text-accent font-medium">{badge.sign}</span>
+      {badge.house && <span className="text-text-muted">{badge.house}H</span>}
+    </div>
+  )
+}
+
 function SectionCard({ section, nickname, showTitle = true }: { section: ReadingSection; nickname: string; showTitle?: boolean }) {
   return (
     <div className="mb-10">
@@ -33,6 +44,13 @@ function SectionCard({ section, nickname, showTitle = true }: { section: Reading
       )}
       {section.subtitle && (
         <p className="text-gold font-medium mb-3">{section.subtitle}</p>
+      )}
+      {section.badges && section.badges.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {section.badges.map((badge, i) => (
+            <BadgeItem key={i} badge={badge} />
+          ))}
+        </div>
       )}
       <div className="bg-bg-card/50 rounded-lg p-4 mb-3 border border-border/50">
         <p className="text-text-muted text-sm leading-relaxed">
@@ -130,6 +148,13 @@ export default function Result() {
                 </h3>
                 {section.subtitle && (
                   <p className="text-gold font-medium text-sm mb-3">{section.subtitle}</p>
+                )}
+                {section.badges && section.badges.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {section.badges.map((badge, i) => (
+                      <BadgeItem key={i} badge={badge} />
+                    ))}
+                  </div>
                 )}
                 <div className="bg-bg/50 rounded-lg p-3.5 mb-3 border border-border/30">
                   <p className="text-text-muted text-sm leading-relaxed">
