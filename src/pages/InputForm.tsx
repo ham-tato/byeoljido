@@ -92,11 +92,11 @@ export default function InputForm() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4">
-        <div className="w-40 h-40 md:w-48 md:h-48 mx-auto rounded-full overflow-hidden border-2 border-accent/30 shadow-lg shadow-accent/10 mb-6 animate-pulse">
+        <div className="w-72 md:w-80 mx-auto mb-6">
           <img
             src={charLoading}
             alt="별을 분석하는 중"
-            className="w-full h-full object-cover object-top"
+            className="w-full h-auto rounded-2xl shadow-2xl shadow-accent/20 animate-pulse"
           />
         </div>
         <p className="text-accent font-medium text-lg mb-2">별을 읽고 있어요...</p>

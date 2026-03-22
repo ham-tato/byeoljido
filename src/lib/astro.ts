@@ -110,24 +110,22 @@ export function calculateChart(
 
   // 애스펙트 추출
   const aspects: Aspect[] = []
-  for (const aspectGroup of horoscope.Aspects?.all || []) {
-    for (const aspect of aspectGroup) {
-      const p1Key = aspect.point1?.key?.toLowerCase()
-      const p2Key = aspect.point2?.key?.toLowerCase()
-      const aspectType = aspect.key?.toLowerCase()
+  for (const aspect of horoscope.Aspects?.all || []) {
+    const p1Key = (aspect.point1Key || aspect.point1?.key || '').toLowerCase()
+    const p2Key = (aspect.point2Key || aspect.point2?.key || '').toLowerCase()
+    const aspectType = (aspect.aspectKey || aspect.key || '').toLowerCase()
 
-      if (
-        p1Key && p2Key && aspectType &&
-        PLANET_MAP[p1Key] && PLANET_MAP[p2Key] &&
-        ASPECT_TYPE_MAP[aspectType]
-      ) {
-        aspects.push({
-          planet1: PLANET_MAP[p1Key],
-          planet2: PLANET_MAP[p2Key],
-          type: ASPECT_TYPE_MAP[aspectType],
-          orb: Math.round((aspect.orb || 0) * 100) / 100,
-        })
-      }
+    if (
+      p1Key && p2Key && aspectType &&
+      PLANET_MAP[p1Key] && PLANET_MAP[p2Key] &&
+      ASPECT_TYPE_MAP[aspectType]
+    ) {
+      aspects.push({
+        planet1: PLANET_MAP[p1Key],
+        planet2: PLANET_MAP[p2Key],
+        type: ASPECT_TYPE_MAP[aspectType],
+        orb: Math.round((aspect.orb || 0) * 100) / 100,
+      })
     }
   }
 
