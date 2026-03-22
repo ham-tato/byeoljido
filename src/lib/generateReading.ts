@@ -5,6 +5,7 @@ import { MC_IN_SIGN } from '@/data/templates/career'
 import { POSITIVE_ASPECTS, NEGATIVE_ASPECTS, getAspectKey } from '@/data/templates/aspects'
 import { NORTH_NODE_IN_SIGN } from '@/data/templates/northNode'
 import { HOUSE_CONTEXT } from '@/data/templates/houses'
+import { eulReul, iGa, gwaWa } from '@/lib/particles'
 
 export interface ReadingSection {
   id: string
@@ -35,14 +36,14 @@ function generateChartSummary(chart: ChartData, nickname: string): { title: stri
   const moon = getElementMetaphor(moonSign)
   const asc = getElementMetaphor(ascSign)
 
-  const title = `${sun.metaphor}을 품은 ${asc.metaphor}, 그리고 ${moon.metaphor}의 내면`
+  const title = `${sun.metaphor}${eulReul(sun.metaphor)} 품은 ${asc.metaphor}, 그리고 ${moon.metaphor}의 내면`
 
   const body = `${nickname}님이 태어난 날, 하늘의 별들은 아주 특별한 그림을 그리고 있었어요. ` +
     `가장 중요한 자아를 뜻하는 태양은 ${sun.metaphor}, ${sunSign}에 머물렀어요. ` +
-    `이 별의 배치 덕분에 ${nickname}님은 ${sun.keyword}을(를) 부여받았죠. ` +
-    `동시에 첫인상을 결정하는 동쪽 지평선에는 ${asc.metaphor}, ${ascSign}가 흐르고 있었어요.\n\n` +
+    `이 별의 배치 덕분에 ${nickname}님은 ${sun.keyword}${eulReul(sun.keyword)} 부여받았죠. ` +
+    `동시에 첫인상을 결정하는 동쪽 지평선에는 ${asc.metaphor}, ${ascSign}${iGa(ascSign)} 흐르고 있었어요.\n\n` +
     `여기에 깊은 내면을 상징하는 달은 ${moon.metaphor}, ${moonSign}의 기운을 가득 품고 있었네요. ` +
-    `결과적으로 ${nickname}님은 ${sun.keyword}과(와) ${asc.keyword}, ` +
+    `결과적으로 ${nickname}님은 ${sun.keyword}${gwaWa(sun.keyword)} ${asc.keyword}, ` +
     `그리고 ${moon.keyword}까지 골고루 갖춘 매력적인 사람으로 태어났어요.`
 
   return { title, body }
@@ -108,7 +109,7 @@ function generateStrengths(chart: ChartData): ReadingSection {
         id: 'strengths',
         title: '빛을 발하는 장점과 나만의 매력',
         subtitle: template.title,
-        starMovement: `${aspect.planet1}과(와) ${aspect.planet2}이(가) 서로를 밀어주는 아주 긍정적인 각도(${typeName})를 맺고 있습니다.`,
+        starMovement: `${aspect.planet1}${gwaWa(aspect.planet1)} ${aspect.planet2}${iGa(aspect.planet2)} 서로를 밀어주는 아주 긍정적인 각도(${typeName})를 맺고 있습니다.`,
         body: template.body,
       }
     }
@@ -142,7 +143,7 @@ function generateChallenges(chart: ChartData): ReadingSection {
         id: 'challenges',
         title: '마주해야 할 과제와 성장의 열쇠',
         subtitle: template.title,
-        starMovement: `${aspect.planet1}과(와) ${aspect.planet2}이(가) 팽팽하게 대립하는 긴장의 각도(${typeName})를 맺고 있습니다.`,
+        starMovement: `${aspect.planet1}${gwaWa(aspect.planet1)} ${aspect.planet2}${iGa(aspect.planet2)} 팽팽하게 대립하는 긴장의 각도(${typeName})를 맺고 있습니다.`,
         body: template.body,
       }
     }
@@ -202,7 +203,7 @@ function generateCareer(chart: ChartData): ReadingSection {
   let extraText = ''
   if (house8Planets.length > 0) {
     extraText = `\n\n가장 흥미로운 부분은 재물운입니다. ` +
-      `타인의 자산과 투자를 의미하는 8하우스에 ${house8Planets.join(', ')}이(가) 자리 잡고 있어서, ` +
+      `타인의 자산과 투자를 의미하는 8하우스에 ${house8Planets.join(', ')}${iGa(house8Planets[house8Planets.length - 1])} 자리 잡고 있어서, ` +
       `큰돈은 꼬박꼬박 모으는 월급 통장보다는 공동 투자, 펀딩, 혹은 트렌디한 비즈니스를 통해 ` +
       `생각지도 못한 타이밍에 수익을 낼 확률이 높습니다.`
   }

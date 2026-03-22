@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useChartStore } from '@/stores/chartStore'
 import { calculateChart } from '@/lib/astro'
@@ -20,17 +20,22 @@ function saveFormDraft(data: Record<string, unknown>) {
 export default function InputForm() {
   const navigate = useNavigate()
   const { setInput, setChart } = useChartStore()
-  const draft = loadFormDraft()
+  const draftRef = useRef(loadFormDraft())
 
-  const [nickname, setNickname] = useState(draft?.nickname || '')
-  const [year, setYear] = useState(draft?.year || '')
-  const [month, setMonth] = useState(draft?.month || '')
-  const [day, setDay] = useState(draft?.day || '')
-  const [hour, setHour] = useState(draft?.hour || '')
-  const [minute, setMinute] = useState(draft?.minute || '')
-  const [city, setCity] = useState<City | null>(draft?.city || null)
+  const [nickname, setNickname] = useState(draftRef.current?.nickname || '')
+  const [year, setYear] = useState(draftRef.current?.year || '')
+  const [month, setMonth] = useState(draftRef.current?.month || '')
+  const [day, setDay] = useState(draftRef.current?.day || '')
+  const [hour, setHour] = useState(draftRef.current?.hour || '')
+  const [minute, setMinute] = useState(draftRef.current?.minute || '')
+  const [city, setCity] = useState<City | null>(draftRef.current?.city || null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // 입력할 때마다 localStorage에 저장
+  useEffect(() => {
+    saveFormDraft({ nickname, year, month, day, hour, minute, city })
+  }, [nickname, year, month, day, hour, minute, city])
 
   const currentYear = new Date().getFullYear()
 
@@ -54,9 +59,6 @@ export default function InputForm() {
 
     setIsLoading(true)
     setError('')
-
-    // 폼 입력값 저장
-    saveFormDraft({ nickname, year, month, day, hour, minute, city })
 
     // 로딩 연출을 위해 약간의 딜레이
     setTimeout(() => {
