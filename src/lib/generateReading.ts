@@ -5,7 +5,9 @@ import { MC_IN_SIGN } from '@/data/templates/career'
 import { POSITIVE_ASPECTS, NEGATIVE_ASPECTS, getAspectKey } from '@/data/templates/aspects'
 import { NORTH_NODE_IN_SIGN } from '@/data/templates/northNode'
 import { HOUSE_CONTEXT } from '@/data/templates/houses'
-import { APPEARANCE_SUBTITLE, INNER_SUBTITLE, COMMUNICATION_SUBTITLE, LOVE_SUBTITLE, CAREER_SUBTITLE, LIFE_DIRECTION_SUBTITLE } from '@/data/templates/subtitles'
+import { JUPITER_IN_SIGN } from '@/data/templates/jupiter'
+import { DESCENDANT_MAP, DESTINED_PARTNER } from '@/data/templates/descendant'
+import { APPEARANCE_SUBTITLE, INNER_SUBTITLE, COMMUNICATION_SUBTITLE, LOVE_SUBTITLE, CAREER_SUBTITLE, LIFE_DIRECTION_SUBTITLE, JUPITER_SUBTITLE, DESTINED_PARTNER_SUBTITLE } from '@/data/templates/subtitles'
 import { eulReul, iGa, gwaWa } from '@/lib/particles'
 
 export interface ReadingSection {
@@ -238,6 +240,36 @@ function generateLifeDirection(chart: ChartData): ReadingSection {
   }
 }
 
+function generateHiddenTalent(chart: ChartData): ReadingSection {
+  const jupiter = chart.planets['목성']
+  if (!jupiter) return { id: 'hiddenTalent', title: '숨겨진 재능과 행운의 열쇠', starMovement: '', body: '' }
+
+  const house = HOUSE_CONTEXT[jupiter.house]
+  const text = JUPITER_IN_SIGN[jupiter.sign] || ''
+
+  return {
+    id: 'hiddenTalent',
+    title: '숨겨진 재능과 행운의 열쇠',
+    subtitle: JUPITER_SUBTITLE[jupiter.sign],
+    starMovement: `확장과 행운의 별 목성이 ${jupiter.sign}에, 그리고 ${house?.area || `${jupiter.house}하우스`}인 ${jupiter.house}하우스에 자리 잡고 있습니다.`,
+    body: text,
+  }
+}
+
+function generateDestinedPartner(chart: ChartData): ReadingSection {
+  const ascSign = chart.ascendant.sign
+  const descSign = DESCENDANT_MAP[ascSign] || '천칭자리'
+  const text = DESTINED_PARTNER[descSign] || ''
+
+  return {
+    id: 'destinedPartner',
+    title: '내 운명의 상대',
+    subtitle: DESTINED_PARTNER_SUBTITLE[descSign],
+    starMovement: `당신의 관계와 파트너십을 뜻하는 디센던트(7하우스)${iGa(descSign)} ${descSign}에 위치해 있습니다. 이는 상승궁 ${ascSign}의 정반대 에너지로, 당신에게 부족한 것을 채워줄 운명의 상대를 가리킵니다.`,
+    body: text,
+  }
+}
+
 export function generateReading(chart: ChartData, nickname: string): Reading {
   const chartSummary = generateChartSummary(chart, nickname)
 
@@ -247,7 +279,9 @@ export function generateReading(chart: ChartData, nickname: string): Reading {
     generateCommunication(chart),
     generateStrengths(chart),
     generateChallenges(chart),
+    generateHiddenTalent(chart),
     generateLove(chart),
+    generateDestinedPartner(chart),
     generateCareer(chart),
     generateLifeDirection(chart),
   ]

@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useChartStore } from '@/stores/chartStore'
 import { generateReading } from '@/lib/generateReading'
 import type { ReadingSection } from '@/lib/generateReading'
+import type { BirthInput, ChartData } from '@/stores/chartStore'
 import charResult from '@/assets/char-result.png'
 
 const SECTION_GROUP: Record<string, string> = {
@@ -16,6 +17,13 @@ const BASIC_LABEL: Record<string, string> = {
   inner: '(2)',
   communication: '(3)',
 }
+
+// 섹션 순서 그룹핑: 기본성향 → 장점/재능 → 관계/사랑 → 커리어/인생
+const SECTION_ORDER = [
+  'strengths', 'hiddenTalent', 'challenges',
+  'love', 'destinedPartner',
+  'career', 'lifeDirection',
+]
 
 function SectionCard({ section, nickname, showTitle = true }: { section: ReadingSection; nickname: string; showTitle?: boolean }) {
   return (
@@ -42,22 +50,40 @@ function SectionCard({ section, nickname, showTitle = true }: { section: Reading
   )
 }
 
+function parseHashData(hash: string): { input: BirthInput; chart: ChartData } | null {
+  try {
+    if (!hash || hash.length < 2) return null
+    const raw = hash.startsWith('#') ? hash.slice(1) : hash
+    return JSON.parse(decodeURIComponent(atob(raw)))
+  } catch {
+    return null
+  }
+}
+
 export default function Result() {
   const navigate = useNavigate()
-  const { input, chart } = useChartStore()
+  const location = useLocation()
+  const storeInput = useChartStore(s => s.input)
+  const storeChart = useChartStore(s => s.chart)
+
+  // URL 해시 → 탭별 독립 데이터, 없으면 스토어 폴백
+  const data = useMemo(() => {
+    return parseHashData(location.hash) || (storeInput && storeChart ? { input: storeInput, chart: storeChart } : null)
+  }, [location.hash, storeInput, storeChart])
 
   useEffect(() => {
-    if (!input || !chart) {
-      navigate('/input')
-    }
-  }, [input, chart, navigate])
+    if (!data) navigate('/input')
+  }, [data, navigate])
 
-  if (!input || !chart) return null
+  if (!data) return null
+  const { input, chart } = data
 
   const reading = generateReading(chart, input.nickname)
 
   const basicSections = reading.sections.filter(s => SECTION_GROUP[s.id] === '타고난 기본 성향')
-  const otherSections = reading.sections.filter(s => !SECTION_GROUP[s.id])
+  const otherSections = SECTION_ORDER
+    .map(id => reading.sections.find(s => s.id === id))
+    .filter((s): s is ReadingSection => !!s)
 
   return (
     <div className="min-h-screen">

@@ -81,7 +81,9 @@ export default function InputForm() {
 
         setInput(input)
         setChart(chart)
-        navigate('/result')
+        // URL에 데이터를 인코딩해서 탭별 독립 결과 보장
+        const payload = btoa(encodeURIComponent(JSON.stringify({ input, chart })))
+        navigate(`/result#${payload}`)
       } catch (err) {
         console.error('Chart calculation error:', err)
         setError('차트 계산 중 오류가 발생했습니다. 입력 정보를 확인해주세요.')
