@@ -12,10 +12,26 @@ const SECTION_GROUP: Record<string, string> = {
   communication: '타고난 기본 성향',
 }
 
+const BASIC_EMOJI: Record<string, string> = {
+  appearance: '🪞',
+  inner: '🌙',
+  communication: '💬',
+}
+
 const BASIC_LABEL: Record<string, string> = {
-  appearance: '(1)',
-  inner: '(2)',
-  communication: '(3)',
+  appearance: '외면 · 첫인상',
+  inner: '내면 · 감정',
+  communication: '소통 · 사고',
+}
+
+const SECTION_EMOJI: Record<string, string> = {
+  strengths: '✨',
+  hiddenTalent: '🍀',
+  challenges: '🔥',
+  love: '💘',
+  destinedPartner: '💫',
+  career: '💼',
+  lifeDirection: '🧭',
 }
 
 // 섹션 순서 그룹핑: 기본성향 → 장점/재능 → 관계/사랑 → 커리어/인생
@@ -131,7 +147,7 @@ export default function Result() {
         {/* 차트 요약 */}
         <div className="mb-12 bg-bg-card rounded-xl p-6 border border-border">
           <h2 className="text-lg font-bold text-gold mb-4">
-            차트 요약: {reading.chartSummary.title}
+            🔮 차트 요약: {reading.chartSummary.title}
           </h2>
           {reading.chartSummary.body.split('\n\n').map((p, i) => (
             <p key={i} className="text-[15px] leading-7 text-text mb-3">{p}</p>
@@ -141,7 +157,7 @@ export default function Result() {
         {/* 타고난 기본 성향 */}
         <div className="mb-12">
           <h2 className="text-xl font-bold text-text mb-6 pb-2 border-b border-border">
-            타고난 기본 성향
+            🌟 타고난 기본 성향
           </h2>
           <div className="space-y-4">
             {basicSections.map(section => (
@@ -150,7 +166,7 @@ export default function Result() {
                 className="bg-bg-card/40 rounded-xl p-5 border border-border/40"
               >
                 <h3 className="text-base font-bold text-accent mb-1">
-                  {BASIC_LABEL[section.id]} {section.title}
+                  {BASIC_EMOJI[section.id]} {BASIC_LABEL[section.id]} · {section.title}
                 </h3>
                 {section.subtitle && (
                   <p className="text-gold font-medium text-sm mb-3">{section.subtitle}</p>
@@ -183,7 +199,7 @@ export default function Result() {
         {otherSections.map(section => (
           <div key={section.id} className="mb-12">
             <h2 className="text-xl font-bold text-text mb-6 pb-2 border-b border-border">
-              {section.title}
+              {SECTION_EMOJI[section.id] || '⭐'} {section.title}
             </h2>
             <SectionCard section={section} nickname={input.nickname} showTitle={false} />
           </div>
