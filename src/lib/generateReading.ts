@@ -5,6 +5,7 @@ import { MC_IN_SIGN } from '@/data/templates/career'
 import { POSITIVE_ASPECTS, NEGATIVE_ASPECTS, getAspectKey } from '@/data/templates/aspects'
 import { NORTH_NODE_IN_SIGN } from '@/data/templates/northNode'
 import { HOUSE_CONTEXT } from '@/data/templates/houses'
+import { APPEARANCE_SUBTITLE, INNER_SUBTITLE, COMMUNICATION_SUBTITLE, LOVE_SUBTITLE, CAREER_SUBTITLE, LIFE_DIRECTION_SUBTITLE } from '@/data/templates/subtitles'
 import { eulReul, iGa, gwaWa } from '@/lib/particles'
 
 export interface ReadingSection {
@@ -56,6 +57,7 @@ function generateAppearance(chart: ChartData): ReadingSection {
   return {
     id: 'appearance',
     title: '남이 보는 나',
+    subtitle: APPEARANCE_SUBTITLE[ascSign],
     starMovement: `당신의 첫인상과 사회적 가면을 뜻하는 상승궁이 ${ascSign}에 위치해 있습니다.`,
     body: text,
   }
@@ -71,6 +73,7 @@ function generateInnerSelf(chart: ChartData): ReadingSection {
   return {
     id: 'inner',
     title: '나의 숨겨진 내면',
+    subtitle: INNER_SUBTITLE[moon.sign],
     starMovement: `무의식과 감정을 상징하는 달이 ${moon.sign}에, ${house?.description || `${moon.house}하우스에 위치해 있습니다.`}`,
     body: text,
   }
@@ -86,6 +89,7 @@ function generateCommunication(chart: ChartData): ReadingSection {
   return {
     id: 'communication',
     title: '내가 세상과 소통하는 방식',
+    subtitle: COMMUNICATION_SUBTITLE[mercury.sign],
     starMovement: `소통과 사고방식을 뜻하는 수성이 ${mercury.sign}에, 그리고 ${house?.area || `${mercury.house}하우스`}인 ${mercury.house}하우스에 자리 잡고 있습니다.`,
     body: text,
   }
@@ -186,6 +190,7 @@ function generateLove(chart: ChartData): ReadingSection {
   return {
     id: 'love',
     title: '사랑과 관계의 방정식',
+    subtitle: LOVE_SUBTITLE[venus.sign],
     starMovement: `연애와 관계를 주관하는 금성이 ${venus.sign}에, 그리고 ${house?.area || `${venus.house}하우스`}인 ${venus.house}하우스에 머물고 있습니다.`,
     body: text + extraText,
   }
@@ -211,6 +216,7 @@ function generateCareer(chart: ChartData): ReadingSection {
   return {
     id: 'career',
     title: '직업적 성취와 재물의 방향',
+    subtitle: CAREER_SUBTITLE[mcSign],
     starMovement: `커리어의 최고점(MC)이 ${mcSign}에 자리 잡고 있습니다.`,
     body: text + extraText,
   }
@@ -224,6 +230,7 @@ function generateLifeDirection(chart: ChartData): ReadingSection {
   return {
     id: 'lifeDirection',
     title: '삶의 흐름과 다가오는 타이밍',
+    subtitle: LIFE_DIRECTION_SUBTITLE[nn.sign],
     starMovement: `이번 생에서 반드시 나아가야 할 진화의 방향을 뜻하는 북교점이 ${nn.sign}에, 그리고 ${house?.area || `${nn.house}하우스`}인 ${nn.house}하우스에 위치하고 있습니다.`,
     body: text,
   }

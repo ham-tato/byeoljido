@@ -5,25 +5,24 @@ import { generateReading } from '@/lib/generateReading'
 import type { ReadingSection } from '@/lib/generateReading'
 import charResult from '@/assets/char-result.png'
 
-const SECTION_LABELS: Record<string, string> = {
-  appearance: '(1)',
-  inner: '(2)',
-  communication: '(3)',
-}
-
 const SECTION_GROUP: Record<string, string> = {
   appearance: '타고난 기본 성향',
   inner: '타고난 기본 성향',
   communication: '타고난 기본 성향',
 }
 
-function SectionCard({ section, nickname }: { section: ReadingSection; nickname: string }) {
-  const label = SECTION_LABELS[section.id] || ''
-  const displayTitle = label ? `${label} ${section.title}` : section.title
+const BASIC_LABEL: Record<string, string> = {
+  appearance: '(1)',
+  inner: '(2)',
+  communication: '(3)',
+}
 
+function SectionCard({ section, nickname, showTitle = true }: { section: ReadingSection; nickname: string; showTitle?: boolean }) {
   return (
     <div className="mb-10">
-      <h3 className="text-lg font-bold text-accent mb-1">{displayTitle}</h3>
+      {showTitle && (
+        <h3 className="text-lg font-bold text-text mb-1">{section.title}</h3>
+      )}
       {section.subtitle && (
         <p className="text-gold font-medium mb-3">{section.subtitle}</p>
       )}
@@ -57,7 +56,6 @@ export default function Result() {
 
   const reading = generateReading(chart, input.nickname)
 
-  // 그룹핑: 기본 성향 섹션
   const basicSections = reading.sections.filter(s => SECTION_GROUP[s.id] === '타고난 기본 성향')
   const otherSections = reading.sections.filter(s => !SECTION_GROUP[s.id])
 
@@ -95,18 +93,42 @@ export default function Result() {
           <h2 className="text-xl font-bold text-text mb-6 pb-2 border-b border-border">
             타고난 기본 성향
           </h2>
-          {basicSections.map(section => (
-            <SectionCard key={section.id} section={section} nickname={input.nickname} />
-          ))}
+          <div className="space-y-4">
+            {basicSections.map(section => (
+              <div
+                key={section.id}
+                className="bg-bg-card/40 rounded-xl p-5 border border-border/40"
+              >
+                <h3 className="text-base font-bold text-accent mb-1">
+                  {BASIC_LABEL[section.id]} {section.title}
+                </h3>
+                {section.subtitle && (
+                  <p className="text-gold font-medium text-sm mb-3">{section.subtitle}</p>
+                )}
+                <div className="bg-bg/50 rounded-lg p-3.5 mb-3 border border-border/30">
+                  <p className="text-text-muted text-sm leading-relaxed">
+                    <span className="text-accent font-medium">별의 움직임: </span>
+                    {section.starMovement}
+                  </p>
+                </div>
+                <div className="text-text leading-relaxed">
+                  <p className="text-text-muted text-sm mb-2 font-medium">{input.nickname}님은?</p>
+                  {section.body.split('\n\n').map((paragraph, i) => (
+                    <p key={i} className="mb-3 text-[15px] leading-7">{paragraph}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* 나머지 섹션 */}
+        {/* 나머지 섹션 — 제목은 h2 한번만 */}
         {otherSections.map(section => (
           <div key={section.id} className="mb-12">
             <h2 className="text-xl font-bold text-text mb-6 pb-2 border-b border-border">
               {section.title}
             </h2>
-            <SectionCard section={section} nickname={input.nickname} />
+            <SectionCard section={section} nickname={input.nickname} showTitle={false} />
           </div>
         ))}
 
