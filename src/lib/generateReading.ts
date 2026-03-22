@@ -37,15 +37,17 @@ function generateChartSummary(chart: ChartData, nickname: string): { title: stri
   const moon = getElementMetaphor(moonSign)
   const asc = getElementMetaphor(ascSign)
 
-  const title = `${sun.metaphor}${eulReul(sun.metaphor)} 품은 ${asc.metaphor}, 그리고 ${moon.metaphor}의 내면`
+  // 제목: 짧고 직관적으로
+  const title = `${sun.shortLabel} 같은 자아, ${asc.shortLabel} 같은 겉모습, ${moon.shortLabel} 같은 내면`
 
   const body = `${nickname}님이 태어난 날, 하늘의 별들은 아주 특별한 그림을 그리고 있었어요. ` +
-    `가장 중요한 자아를 뜻하는 태양은 ${sun.metaphor}, ${sunSign}에 머물렀어요. ` +
-    `이 별의 배치 덕분에 ${nickname}님은 ${sun.keyword}${eulReul(sun.keyword)} 부여받았죠. ` +
-    `동시에 첫인상을 결정하는 동쪽 지평선에는 ${asc.metaphor}, ${ascSign}${iGa(ascSign)} 흐르고 있었어요.\n\n` +
-    `여기에 깊은 내면을 상징하는 달은 ${moon.metaphor}, ${moonSign}의 기운을 가득 품고 있었네요. ` +
-    `결과적으로 ${nickname}님은 ${sun.keyword}${gwaWa(sun.keyword)} ${asc.keyword}, ` +
-    `그리고 ${moon.keyword}까지 골고루 갖춘 매력적인 사람으로 태어났어요.`
+    `가장 중요한 자아를 뜻하는 태양은 ${sun.metaphor}의 기운을 가진 ${sunSign}에 머물렀어요. ` +
+    `이 배치 덕분에 ${nickname}님은 ${sun.keyword}${eulReul(sun.keyword)} 타고났죠. ` +
+    `동시에 첫인상을 결정하는 동쪽 지평선에는 ${asc.metaphor} 같은 ${ascSign}${iGa(ascSign)} 자리하고 있었어요.\n\n` +
+    `여기에 깊은 내면을 상징하는 달은 ${moon.metaphor}의 기운을 가진 ${moonSign}에 머물고 있었네요. ` +
+    `정리하면, ${nickname}님은 겉으로는 ${asc.keyword}${eulReul(asc.keyword)} 보여주면서, ` +
+    `중심에는 ${sun.keyword}${iGa(sun.keyword)} 단단하게 자리 잡고, ` +
+    `내면 깊은 곳에서는 ${moon.keyword}${iGa(moon.keyword)} 조용히 흐르는 사람이에요.`
 
   return { title, body }
 }

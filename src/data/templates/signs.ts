@@ -1,17 +1,18 @@
 // 별자리별 원소/키워드 매핑 (차트 요약 조합용)
-export const SIGN_ELEMENT: Record<string, { element: string; metaphor: string; keyword: string }> = {
-  '양자리': { element: '불', metaphor: '타오르는 불꽃', keyword: '돌진하는 용기와 뜨거운 열정' },
-  '황소자리': { element: '흙', metaphor: '변함없는 대지', keyword: '우직함과 현실 감각' },
-  '쌍둥이자리': { element: '바람', metaphor: '쉴 새 없이 부는 바람', keyword: '호기심과 재치 넘치는 소통력' },
-  '게자리': { element: '물', metaphor: '따뜻하게 보듬는 물', keyword: '깊은 공감력과 포용력' },
-  '사자자리': { element: '불', metaphor: '한낮의 태양', keyword: '당당한 자신감과 리더십' },
-  '처녀자리': { element: '흙', metaphor: '정교하게 갈아 놓은 옥토', keyword: '꼼꼼한 분석력과 완벽주의' },
-  '천칭자리': { element: '바람', metaphor: '우아하게 흐르는 산들바람', keyword: '조화와 균형을 추구하는 미적 감각' },
-  '전갈자리': { element: '물', metaphor: '깊은 심해의 조류', keyword: '강렬한 직관력과 통찰력' },
-  '사수자리': { element: '불', metaphor: '끝없이 타오르는 모닥불', keyword: '자유로운 모험 정신과 철학적 사고' },
-  '염소자리': { element: '흙', metaphor: '흔들리지 않는 산', keyword: '묵묵한 책임감과 야망' },
-  '물병자리': { element: '바람', metaphor: '시대를 앞서가는 돌풍', keyword: '독창적인 사고와 혁신' },
-  '물고기자리': { element: '물', metaphor: '경계 없는 바다', keyword: '무한한 상상력과 영적 감수성' },
+// shortLabel: 제목에 쓰는 2~3글자 핵심어, metaphor: 본문용 비유, keyword: 부여받은 성질
+export const SIGN_ELEMENT: Record<string, { element: string; shortLabel: string; metaphor: string; keyword: string }> = {
+  '양자리': { element: '불', shortLabel: '불꽃', metaphor: '타오르는 불꽃', keyword: '돌진하는 용기와 뜨거운 열정' },
+  '황소자리': { element: '흙', shortLabel: '대지', metaphor: '변함없는 대지', keyword: '우직함과 현실 감각' },
+  '쌍둥이자리': { element: '바람', shortLabel: '바람', metaphor: '쉴 새 없이 부는 호기심의 바람', keyword: '재치 넘치는 소통력과 지적 호기심' },
+  '게자리': { element: '물', shortLabel: '바다', metaphor: '따뜻하게 보듬는 바다', keyword: '깊은 공감력과 포용력' },
+  '사자자리': { element: '불', shortLabel: '태양', metaphor: '한낮의 태양', keyword: '당당한 자신감과 리더십' },
+  '처녀자리': { element: '흙', shortLabel: '옥토', metaphor: '정교하게 다듬어진 옥토', keyword: '꼼꼼한 분석력과 완벽주의' },
+  '천칭자리': { element: '바람', shortLabel: '산들바람', metaphor: '우아한 산들바람', keyword: '조화와 균형을 추구하는 미적 감각' },
+  '전갈자리': { element: '물', shortLabel: '심해', metaphor: '깊은 심해', keyword: '강렬한 직관력과 통찰력' },
+  '사수자리': { element: '불', shortLabel: '모닥불', metaphor: '끝없이 타오르는 모닥불', keyword: '자유로운 모험 정신과 철학적 사고' },
+  '염소자리': { element: '흙', shortLabel: '바위산', metaphor: '흔들리지 않는 산', keyword: '묵묵한 책임감과 야망' },
+  '물병자리': { element: '바람', shortLabel: '돌풍', metaphor: '시대를 앞서가는 돌풍', keyword: '독창적인 사고와 혁신' },
+  '물고기자리': { element: '물', shortLabel: '안개', metaphor: '경계 없는 바다', keyword: '무한한 상상력과 영적 감수성' },
 }
 
 // 상승궁 해석 (남이 보는 나)
