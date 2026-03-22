@@ -6,90 +6,65 @@ import type { ReadingSection, StarBadge } from '@/lib/generateReading'
 import type { BirthInput, ChartData } from '@/stores/chartStore'
 import charResult from '@/assets/char-result.png'
 import NightSky from '@/components/NightSky'
+import TextRenderer from '@/components/TextRenderer'
 
 const BASIC_IDS = ['appearance', 'inner', 'communication']
-const BASIC_LABEL: Record<string, string> = {
-  appearance: 'The Mask',
-  inner: 'The Soul',
-  communication: 'The Voice',
-}
-const BASIC_KR: Record<string, string> = {
-  appearance: '세상이 보는 나',
-  inner: '숨겨진 내면',
-  communication: '소통하는 방식',
-}
 const SECTION_ORDER = ['strengths', 'hiddenTalent', 'challenges', 'love', 'destinedPartner', 'career', 'lifeDirection']
-
-const CHAPTER_TITLES: Record<string, { en: string; kr: string }> = {
-  strengths: { en: 'The Gift', kr: '빛을 발하는 장점' },
-  hiddenTalent: { en: 'The Hidden Key', kr: '숨겨진 재능과 행운' },
-  challenges: { en: 'The Trial', kr: '마주할 과제와 성장' },
-  love: { en: 'The Heart', kr: '사랑과 관계' },
-  destinedPartner: { en: 'The Fated One', kr: '운명의 상대' },
-  career: { en: 'The Path', kr: '직업과 재물' },
-  lifeDirection: { en: 'The Compass', kr: '삶의 흐름과 방향' },
-}
 
 function BadgeItem({ badge }: { badge: StarBadge }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
       <span className="font-display text-base text-gold italic">{badge.symbol}</span>
       <span>{badge.sign}</span>
-      {badge.house && <span className="opacity-50">— {badge.house}하우스</span>}
+      {badge.house && <span className="opacity-50">· {badge.house}하우스</span>}
     </span>
   )
 }
 
-function Ornament({ text }: { text?: string }) {
+function Ornament() {
   return (
-    <div className="ornament my-16">
-      {text || '✦'}
+    <div className="ornament my-20">✦</div>
+  )
+}
+
+function BodyText({ text }: { text: string }) {
+  return (
+    <div className="text-[15px] text-text/75 space-y-4 leading-[1.9]">
+      {text.split('\n\n').map((p, i) => (
+        <p key={i}><TextRenderer text={p} /></p>
+      ))}
     </div>
   )
 }
 
-function ChapterBlock({ num, enTitle, section, nickname }: {
-  num: number
-  enTitle: string
-  section: ReadingSection
-  nickname: string
-}) {
+function ChapterSection({ num, section }: { num: string; section: ReadingSection }) {
   return (
-    <div className="mb-20">
-      {/* 챕터 헤더 */}
+    <div className="mb-24">
+      {/* 챕터 넘버 + 제목 */}
       <div className="mb-10">
-        <p className="font-display text-sm italic text-text-muted tracking-wide mb-1">
-          Chapter {String(num).padStart(2, '0')}
-        </p>
-        <p className="font-display text-3xl italic text-gold mb-2 leading-tight">{enTitle}</p>
-        <h3 className="text-xl font-serif text-text">{section.title}</h3>
+        <span className="chapter-num text-6xl">{num}</span>
+        <h3 className="text-2xl font-serif text-text mt-3 mb-2">{section.title}</h3>
+        {section.subtitle && (
+          <p className="text-[15px] text-text-muted leading-relaxed italic">
+            — {section.subtitle}
+          </p>
+        )}
       </div>
-
-      {/* subtitle */}
-      {section.subtitle && (
-        <p className="text-base text-text font-medium leading-relaxed mb-6 border-l-2 border-gold/50 pl-4">
-          {section.subtitle}
-        </p>
-      )}
 
       {/* 천문 근거 */}
       {section.badges && section.badges.length > 0 && (
-        <div className="flex flex-wrap gap-x-5 gap-y-1 mb-6">
+        <div className="flex flex-wrap gap-x-5 gap-y-1 mb-5 border-l border-gold/40 pl-4">
           {section.badges.map((b, i) => <BadgeItem key={i} badge={b} />)}
         </div>
       )}
 
       {/* 별의 움직임 */}
-      <p className="text-[13px] text-text-muted leading-relaxed mb-8 font-serif italic">
-        "{section.starMovement}"
+      <p className="text-[13px] text-text-muted/70 leading-relaxed mb-8 italic pl-4 border-l border-border">
+        {section.starMovement}
       </p>
 
       {/* 본문 */}
-      <div className="text-[15px] text-text/80 space-y-4 leading-[1.9]">
-        {section.body.split('\n\n').map((p, i) => (
-          <p key={i}>{p}</p>
-        ))}
-      </div>
+      <BodyText text={section.body} />
     </div>
   )
 }
@@ -129,173 +104,158 @@ export default function Result() {
     .map(id => reading.sections.find(s => s.id === id))
     .filter((s): s is ReadingSection => !!s)
 
+  const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+
   return (
     <main className="max-w-lg mx-auto pb-32">
 
-      {/* ══════ 표지 ══════ */}
-      <header className="pt-24 pb-16 px-8 text-center">
-        <p className="font-display text-sm italic text-text-muted tracking-[0.25em] mb-6">A Celestial Portrait of</p>
-        <h1 className="font-display text-5xl italic text-gold mb-4 leading-[1.15]">
-          {input.nickname}
+      {/* ══════════════════════════════
+           표지
+         ══════════════════════════════ */}
+      <header className="pt-28 pb-20 px-8 text-center">
+        <p className="text-[11px] text-text-muted tracking-[0.3em] uppercase mb-8 font-display">
+          A Celestial Portrait
+        </p>
+
+        <h1 className="font-serif text-4xl text-text mb-3 leading-snug">
+          {input.nickname}님의 별지도
         </h1>
-        <div className="w-12 h-px bg-gold mx-auto mb-4" />
+
+        <div className="flex items-center justify-center gap-3 my-6">
+          <div className="w-12 h-px bg-gold/60" />
+          <span className="text-gold text-xs">✦</span>
+          <div className="w-12 h-px bg-gold/60" />
+        </div>
+
         <p className="text-sm text-text-muted leading-relaxed">
-          {input.year}년 {input.month}월 {input.day}일 &ensp;
-          {String(input.hour).padStart(2, '0')}:{String(input.minute).padStart(2, '0')}<br />
-          {input.city.name}, {input.city.country}
+          {input.year}년 {input.month}월 {input.day}일&ensp;
+          {String(input.hour).padStart(2, '0')}시 {String(input.minute).padStart(2, '0')}분<br />
+          <span className="text-xs">{input.city.name}, {input.city.country}</span>
         </p>
       </header>
 
-      {/* ══════ 밤하늘 ══════ */}
-      <section className="px-8 mb-8">
+      {/* ══════════════════════════════
+           밤하늘
+         ══════════════════════════════ */}
+      <section className="px-8 mb-6">
         <NightSky chart={chart} />
       </section>
-      <p className="text-center font-display text-xs italic text-text-muted tracking-[0.2em] mb-20">
-        The sky at the moment of your birth
+      <p className="text-center text-[10px] text-text-muted/50 tracking-[0.2em] uppercase font-display mb-24">
+        The sky at the moment of birth
       </p>
 
-      <Ornament text="⟡" />
+      <Ornament />
 
-      {/* ══════ 차트 요약 (프롤로그) ══════ */}
-      <section className="px-8 mb-20">
-        <p className="font-display text-sm italic text-text-muted tracking-wide mb-1">Prologue</p>
-        <p className="font-display text-3xl italic text-gold mb-2 leading-tight">The Celestial Blueprint</p>
-        <h2 className="text-lg font-serif text-text mb-8">{reading.chartSummary.title}</h2>
+      {/* ══════════════════════════════
+           서문 — 차트 요약
+         ══════════════════════════════ */}
+      <section className="px-8 mb-24">
+        <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Prologue</p>
+        <h2 className="text-2xl font-serif text-text mb-2">당신이 태어나던 순간의 하늘</h2>
+        <p className="text-sm text-text-muted italic mb-8">{reading.chartSummary.title}</p>
 
-        {reading.chartSummary.body.split('\n\n').map((p, i) => (
-          <p key={i} className="text-[15px] leading-[1.9] text-text/80 mb-4">{p}</p>
+        <BodyText text={reading.chartSummary.body} />
+      </section>
+
+      <Ornament />
+
+      {/* ══════════════════════════════
+           제1장 — 타고난 기본 성향
+         ══════════════════════════════ */}
+      <section className="px-8">
+        <div className="text-center mb-20">
+          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Part One</p>
+          <h2 className="text-3xl font-serif text-text mb-2">타고난 기본 성향</h2>
+          <p className="text-sm text-text-muted">당신의 자아, 감정, 그리고 첫인상을 결정하는 세 개의 기둥</p>
+        </div>
+
+        {basicSections.map((section, i) => (
+          <ChapterSection key={section.id} num={romanNumerals[i]} section={section} />
         ))}
       </section>
 
       <Ornament />
 
-      {/* ══════ 기본 성향 — The Three Pillars ══════ */}
-      <section className="px-8 mb-8">
-        <div className="text-center mb-16">
-          <p className="font-display text-sm italic text-text-muted tracking-wide mb-1">Part One</p>
-          <p className="font-display text-4xl italic text-gold mb-3 leading-tight">The Three Pillars</p>
-          <h2 className="text-lg font-serif text-text">타고난 기본 성향</h2>
-        </div>
-
-        {basicSections.map((section, i) => (
-          <div key={section.id} className="mb-20">
-            {/* 소챕터 헤더 */}
-            <div className="text-center mb-10">
-              <span className="chapter-num text-5xl">{['I', 'II', 'III'][i]}</span>
-              <p className="font-display text-xl italic text-gold mt-2 mb-1">{BASIC_LABEL[section.id]}</p>
-              <h3 className="text-lg font-serif text-text">{BASIC_KR[section.id]}</h3>
-            </div>
-
-            {section.subtitle && (
-              <p className="text-base text-text font-medium leading-relaxed mb-6 text-center italic">
-                — {section.subtitle} —
-              </p>
-            )}
-
-            {section.badges && section.badges.length > 0 && (
-              <div className="flex justify-center flex-wrap gap-x-5 gap-y-1 mb-6">
-                {section.badges.map((b, j) => <BadgeItem key={j} badge={b} />)}
-              </div>
-            )}
-
-            <p className="text-[13px] text-text-muted leading-relaxed mb-8 font-serif italic text-center">
-              "{section.starMovement}"
-            </p>
-
-            <div className="text-[15px] text-text/80 space-y-4 leading-[1.9]">
-              {section.body.split('\n\n').map((p, j) => (
-                <p key={j}>{p}</p>
-              ))}
-            </div>
-
-            {i < basicSections.length - 1 && <Ornament text="·" />}
-          </div>
-        ))}
-      </section>
-
-      <Ornament text="⟡" />
-
-      {/* ══════ Part Two — 강점과 성장 ══════ */}
+      {/* ══════════════════════════════
+           제2장 — 강점과 성장
+         ══════════════════════════════ */}
       <section className="px-8">
-        <div className="text-center mb-16">
-          <p className="font-display text-sm italic text-text-muted tracking-wide mb-1">Part Two</p>
-          <p className="font-display text-4xl italic text-gold mb-3 leading-tight">Light & Shadow</p>
-          <h2 className="text-lg font-serif text-text">강점, 재능, 그리고 시련</h2>
+        <div className="text-center mb-20">
+          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Part Two</p>
+          <h2 className="text-3xl font-serif text-text mb-2">빛과 그림자</h2>
+          <p className="text-sm text-text-muted">당신이 타고난 매력, 숨겨진 재능, 그리고 넘어야 할 벽</p>
         </div>
 
         {otherSections.filter(s => ['strengths', 'hiddenTalent', 'challenges'].includes(s.id)).map((section, i) => (
-          <ChapterBlock
-            key={section.id}
-            num={i + 4}
-            enTitle={CHAPTER_TITLES[section.id]?.en || ''}
-            section={section}
-            nickname={input.nickname}
-          />
+          <ChapterSection key={section.id} num={romanNumerals[i + 3]} section={section} />
         ))}
       </section>
 
-      <Ornament text="⟡" />
+      <Ornament />
 
-      {/* ══════ Part Three — 사랑 ══════ */}
+      {/* ══════════════════════════════
+           제3장 — 사랑과 운명
+         ══════════════════════════════ */}
       <section className="px-8">
-        <div className="text-center mb-16">
-          <p className="font-display text-sm italic text-text-muted tracking-wide mb-1">Part Three</p>
-          <p className="font-display text-4xl italic text-gold mb-3 leading-tight">Love & Destiny</p>
-          <h2 className="text-lg font-serif text-text">사랑과 운명</h2>
+        <div className="text-center mb-20">
+          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Part Three</p>
+          <h2 className="text-3xl font-serif text-text mb-2">사랑과 운명</h2>
+          <p className="text-sm text-text-muted">당신의 연애 방식과 운명이 이끄는 상대</p>
         </div>
 
         {otherSections.filter(s => ['love', 'destinedPartner'].includes(s.id)).map((section, i) => (
-          <ChapterBlock
-            key={section.id}
-            num={i + 7}
-            enTitle={CHAPTER_TITLES[section.id]?.en || ''}
-            section={section}
-            nickname={input.nickname}
-          />
+          <ChapterSection key={section.id} num={romanNumerals[i + 6]} section={section} />
         ))}
       </section>
 
-      <Ornament text="⟡" />
+      <Ornament />
 
-      {/* ══════ Part Four — 커리어와 인생 ══════ */}
+      {/* ══════════════════════════════
+           제4장 — 커리어와 인생
+         ══════════════════════════════ */}
       <section className="px-8">
-        <div className="text-center mb-16">
-          <p className="font-display text-sm italic text-text-muted tracking-wide mb-1">Part Four</p>
-          <p className="font-display text-4xl italic text-gold mb-3 leading-tight">Vocation & Voyage</p>
-          <h2 className="text-lg font-serif text-text">커리어와 인생의 방향</h2>
+        <div className="text-center mb-20">
+          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Part Four</p>
+          <h2 className="text-3xl font-serif text-text mb-2">항해의 방향</h2>
+          <p className="text-sm text-text-muted">직업적 성취와 이번 생의 여정이 향하는 곳</p>
         </div>
 
         {otherSections.filter(s => ['career', 'lifeDirection'].includes(s.id)).map((section, i) => (
-          <ChapterBlock
-            key={section.id}
-            num={i + 9}
-            enTitle={CHAPTER_TITLES[section.id]?.en || ''}
-            section={section}
-            nickname={input.nickname}
-          />
+          <ChapterSection key={section.id} num={romanNumerals[i + 8]} section={section} />
         ))}
       </section>
 
-      <Ornament text="⟡" />
+      <Ornament />
 
-      {/* ══════ 에필로그 ══════ */}
-      <footer className="px-8 text-center mt-8">
-        <p className="font-display text-sm italic text-text-muted tracking-wide mb-1">Epilogue</p>
-        <p className="font-display text-2xl italic text-gold mb-8 leading-tight">The Stars Within You</p>
-        <img src={charResult} alt="" width={80} height={80} className="rounded-full mx-auto mb-6 object-cover object-top" />
-        <p className="text-[15px] text-text-muted font-serif leading-loose mb-12">
+      {/* ══════════════════════════════
+           에필로그
+         ══════════════════════════════ */}
+      <footer className="px-8 text-center mt-4">
+        <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Epilogue</p>
+
+        <img src={charResult} alt="" width={72} height={72} className="rounded-full mx-auto mb-6 object-cover object-top shadow-sm" />
+
+        <p className="text-[16px] text-text/70 font-serif leading-loose mb-16">
           별들은 당신을 이끄는 것이 아니라,<br />
-          당신 안에 이미 있는 빛을 비춰주는<br />
-          거울일 뿐입니다.
+          당신 안에 이미 존재하는 빛을<br />
+          비춰주는 거울일 뿐입니다.
         </p>
 
         <button
           onClick={() => navigate('/input')}
-          className="px-8 py-3 border border-text text-text rounded-none transition-colors cursor-pointer hover:bg-text hover:text-white text-sm tracking-wider font-display"
+          className="px-8 py-3 border border-text/30 text-text text-sm tracking-wider hover:bg-text hover:text-bg transition-colors cursor-pointer font-serif"
         >
-          Begin Another Reading
+          다른 별지도 펼쳐보기
         </button>
-        <div className="mt-12 text-[10px] text-text-muted/50 tracking-widest uppercase">&copy; 2026 별지도</div>
+
+        <div className="mt-16 mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-8 h-px bg-border" />
+            <span className="text-text-muted/40 text-[10px]">✦</span>
+            <div className="w-8 h-px bg-border" />
+          </div>
+          <p className="text-[10px] text-text-muted/40 tracking-widest uppercase">&copy; 2026 별지도</p>
+        </div>
       </footer>
     </main>
   )
