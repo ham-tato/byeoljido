@@ -83,7 +83,7 @@ function generateAppearance(chart: ChartData): ReadingSection {
 
 function generateInnerSelf(chart: ChartData): ReadingSection {
   const moon = chart.planets['달']
-  if (!moon) return { id: 'inner', title: '나의 숨겨진 내면', starMovement: '', body: '' }
+  if (!moon) return { id: 'inner', title: '나의 숨겨진 내면', starMovement: '달의 위치를 계산할 수 없습니다.', body: '출생 시간을 정확히 입력하면 더 정확한 분석이 가능합니다.' }
 
   const house = HOUSE_CONTEXT[moon.house]
   const text = MOON_IN_SIGN[moon.sign] || ''
@@ -100,7 +100,7 @@ function generateInnerSelf(chart: ChartData): ReadingSection {
 
 function generateCommunication(chart: ChartData): ReadingSection {
   const mercury = chart.planets['수성']
-  if (!mercury) return { id: 'communication', title: '내가 세상과 소통하는 방식', starMovement: '', body: '' }
+  if (!mercury) return { id: 'communication', title: '내가 세상과 소통하는 방식', starMovement: '수성의 위치를 계산할 수 없습니다.', body: '출생 시간을 정확히 입력하면 더 정확한 분석이 가능합니다.' }
 
   const house = HOUSE_CONTEXT[mercury.house]
   const text = MERCURY_IN_SIGN[mercury.sign] || ''
@@ -110,7 +110,7 @@ function generateCommunication(chart: ChartData): ReadingSection {
     title: '내가 세상과 소통하는 방식',
     subtitle: COMMUNICATION_SUBTITLE[mercury.sign],
     badges: [{ symbol: '☿', label: '수성', sign: mercury.sign, house: mercury.house }],
-    starMovement: `소통과 사고방식을 뜻하는 수성이 ${mercury.sign}에, 그리고 ${house?.area || `${mercury.house}하우스`}인 ${mercury.house}하우스에 자리 잡고 있습니다.`,
+    starMovement: `소통과 사고방식을 뜻하는 수성이 ${mercury.sign} ${mercury.house}하우스에 자리 잡고 있습니다.`,
     body: text,
   }
 }
@@ -273,7 +273,7 @@ function generateLifeDirection(chart: ChartData): ReadingSection {
 
 function generateHiddenTalent(chart: ChartData): ReadingSection {
   const jupiter = chart.planets['목성']
-  if (!jupiter) return { id: 'hiddenTalent', title: '숨겨진 재능과 행운의 열쇠', starMovement: '', body: '' }
+  if (!jupiter) return { id: 'hiddenTalent', title: '숨겨진 재능과 행운의 열쇠', starMovement: '목성의 위치를 계산할 수 없습니다.', body: '출생 시간을 정확히 입력하면 더 정확한 분석이 가능합니다.' }
 
   const house = HOUSE_CONTEXT[jupiter.house]
   const text = JUPITER_IN_SIGN[jupiter.sign] || ''

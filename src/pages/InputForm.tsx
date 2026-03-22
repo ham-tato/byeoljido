@@ -46,6 +46,11 @@ export default function InputForm() {
     if (!y || y < 1900 || y > currentYear) return '올바른 출생연도를 입력해주세요.'
     if (!m || m < 1 || m > 12) return '올바른 월을 입력해주세요.'
     if (!d || d < 1 || d > 31) return '올바른 일을 입력해주세요.'
+    // 실제 날짜 유효성 체크 (2월 30일 등 방지)
+    const testDate = new Date(y, m - 1, d)
+    if (testDate.getFullYear() !== y || testDate.getMonth() !== m - 1 || testDate.getDate() !== d) {
+      return `${y}년 ${m}월 ${d}일은 존재하지 않는 날짜입니다.`
+    }
     if (isNaN(h) || h < 0 || h > 23) return '올바른 시간을 입력해주세요. (0~23)'
     if (isNaN(min) || min < 0 || min > 59) return '올바른 분을 입력해주세요. (0~59)'
     if (!city) return '출생 도시를 선택해주세요.'
@@ -81,9 +86,10 @@ export default function InputForm() {
 
         setInput(input)
         setChart(chart)
-        // URL에 데이터를 인코딩해서 탭별 독립 결과 보장
-        const payload = btoa(encodeURIComponent(JSON.stringify({ input, chart })))
-        navigate(`/result#${payload}`)
+        // sessionStorage에 결과 저장 (탭별 독립)
+        const resultId = Date.now().toString(36)
+        sessionStorage.setItem(`byeoljido_result_${resultId}`, JSON.stringify({ input, chart }))
+        navigate(`/result?id=${resultId}`)
       } catch (err) {
         console.error('Chart calculation error:', err)
         setError('차트 계산 중 오류가 발생했습니다. 입력 정보를 확인해주세요.')

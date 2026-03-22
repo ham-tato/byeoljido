@@ -14,6 +14,8 @@ export default function Landing() {
             <img
               src={charLanding}
               alt="별지도 점성술사"
+              width={256}
+              height={256}
               className="w-full h-full object-cover object-top"
             />
           </div>

@@ -68,11 +68,15 @@ function SectionCard({ section, nickname, showTitle = true }: { section: Reading
   )
 }
 
-function parseHashData(hash: string): { input: BirthInput; chart: ChartData } | null {
+function loadResultData(search: string): { input: BirthInput; chart: ChartData } | null {
   try {
-    if (!hash || hash.length < 2) return null
-    const raw = hash.startsWith('#') ? hash.slice(1) : hash
-    return JSON.parse(decodeURIComponent(atob(raw)))
+    const params = new URLSearchParams(search)
+    const id = params.get('id')
+    if (id) {
+      const raw = sessionStorage.getItem(`byeoljido_result_${id}`)
+      if (raw) return JSON.parse(raw)
+    }
+    return null
   } catch {
     return null
   }
@@ -84,16 +88,16 @@ export default function Result() {
   const storeInput = useChartStore(s => s.input)
   const storeChart = useChartStore(s => s.chart)
 
-  // URL 해시 → 탭별 독립 데이터, 없으면 스토어 폴백
+  // sessionStorage → 탭별 독립, 없으면 스토어 폴백
   const data = useMemo(() => {
-    return parseHashData(location.hash) || (storeInput && storeChart ? { input: storeInput, chart: storeChart } : null)
-  }, [location.hash, storeInput, storeChart])
+    return loadResultData(location.search) || (storeInput && storeChart ? { input: storeInput, chart: storeChart } : null)
+  }, [location.search, storeInput, storeChart])
 
   useEffect(() => {
     if (!data) navigate('/input')
   }, [data, navigate])
 
-  if (!data) return null
+  if (!data) return <div className="min-h-screen flex items-center justify-center text-text-muted">로딩 중...</div>
   const { input, chart } = data
 
   const reading = generateReading(chart, input.nickname)
@@ -111,6 +115,8 @@ export default function Result() {
           <img
             src={charResult}
             alt="결과를 안내하는 점성술사"
+            width={128}
+            height={128}
             className="w-full h-full object-cover object-top"
           />
         </div>

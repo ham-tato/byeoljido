@@ -64,7 +64,7 @@ export async function searchCities(query: string): Promise<City[]> {
     const data = await res.json()
 
     return (data || [])
-      .filter((g: Record<string, string>) => g.type === 'city' || g.type === 'town' || g.type === 'village' || g.type === 'administrative')
+      .filter((g: Record<string, string>) => g.type === 'city' || g.type === 'town' || g.type === 'village')
       .map((g: Record<string, string>) => {
         const parts = (g.display_name || '').split(', ')
         const country = parts[parts.length - 1] || ''
