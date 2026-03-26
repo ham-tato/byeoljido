@@ -292,8 +292,8 @@ export default function NightSky({ chart }: { chart: ChartData }) {
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full backdrop-blur-md flex flex-col items-center justify-center text-center"
         style={{
-          width: '34%',
-          height: '34%',
+          width: '30%',
+          height: '30%',
           zIndex: 40,
           background: activeItem ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.6)',
           border: `1px solid ${activeItem ? 'rgba(212,175,55,0.7)' : 'rgba(212,175,55,0.3)'}`,
@@ -341,7 +341,7 @@ export default function NightSky({ chart }: { chart: ChartData }) {
                     <span key={p.name} className={p.colorClass}>{p.symbol}</span>
                   ))}
                 </div>
-                <div style={{ color: '#e5e7eb', fontWeight: 600, fontSize: 'clamp(9px, 2.4vw, 11px)', lineHeight: 1.2, textAlign: 'center' }}>
+                <div style={{ color: '#e5e7eb', fontWeight: 600, fontSize: 'clamp(8px, 2vw, 10px)', lineHeight: 1.1, textAlign: 'center' }}>
                   {activeItem.planets.map(p => p.name).join(' · ')}
                 </div>
               </>
@@ -363,15 +363,11 @@ export default function NightSky({ chart }: { chart: ChartData }) {
               </span>
             </div>
 
-            {/* 닫기 유도 */}
+            {/* 닫기 유도: 터치 시 × 표시 */}
             <span style={{
-              color: 'rgba(156,163,175,0.5)',
-              fontSize: 'clamp(8px, 2vw, 10px)',
-              letterSpacing: '0.05em',
-              marginTop: '1px',
-            }}>
-              눌러서 닫기
-            </span>
+              color: 'rgba(156,163,175,0.4)',
+              fontSize: 'clamp(7px, 1.8vw, 9px)',
+            }}>×</span>
           </div>
         ) : (
           <span style={{ color: '#EAB308', fontSize: 'clamp(14px, 3vw, 20px)', textShadow: '0 0 15px rgba(212,175,55,0.8)' }}>
