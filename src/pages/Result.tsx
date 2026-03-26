@@ -94,6 +94,14 @@ function ChapterSection({ num, section }: { num: string; section: ReadingSection
 
       {/* 본문 */}
       <BodyText text={section.body} />
+
+      {/* 실천 조언 */}
+      {section.action && (
+        <div className="mt-8 px-4 py-4 border-l-2 border-gold/60" style={{ background: 'rgba(197,160,40,0.06)' }}>
+          <p className="text-[10px] tracking-[0.2em] uppercase text-gold/70 mb-2 font-display">그래서 어떻게 할까요</p>
+          <p className="text-[14px] text-text/80 leading-relaxed">{section.action}</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -314,6 +322,13 @@ export default function Result() {
               </div>
 
               <BodyText text={section.body} />
+
+              {section.action && (
+                <div className="mt-8 px-4 py-4 border-l-2 border-gold/60" style={{ background: 'rgba(197,160,40,0.06)' }}>
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-gold/70 mb-2 font-display">그래서 어떻게 할까요</p>
+                  <p className="text-[14px] text-text/80 leading-relaxed">{section.action}</p>
+                </div>
+              )}
             </div>
           ) : (
             <ChapterSection key={section.id} num={romanNumerals[i + 8]} section={section} />
