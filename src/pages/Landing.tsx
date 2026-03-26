@@ -69,7 +69,7 @@ export default function Landing() {
 
       {/* 메인 카피 */}
       <div className="max-w-sm mx-auto mb-12 relative">
-        <h1 className="gold-gradient-text text-[2.6rem] leading-[1.3] mb-8" style={{ fontFamily: "'SokchoBadaBatang', serif", fontWeight: 'normal' }}>
+        <h1 className="gold-gradient-text leading-[1.3] mb-8" style={{ fontFamily: "'SokchoBadaBatang', serif", fontWeight: 'normal', fontSize: 'clamp(1.6rem, 7.5vw, 2.6rem)' }}>
           당신이 태어나던 순간<br />
           하늘이 남긴 기록
         </h1>
