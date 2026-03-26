@@ -191,7 +191,7 @@ export default function InputForm() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-text mb-2">당신의 별을 읽어드릴게요</h1>
-          <p className="text-text-muted text-sm">태어난 순간의 하늘을 정확히 복원하기 위해, 아래 정보를 입력해주세요.</p>
+          <p className="text-text-muted text-sm">태어난 순간의 하늘을 정확히 복원하기 위해,<br />아래 정보를 입력해주세요.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
