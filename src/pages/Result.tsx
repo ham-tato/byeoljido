@@ -1,12 +1,39 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useChartStore } from '@/stores/chartStore'
 import { generateReading } from '@/lib/generateReading'
+import { calculateChart } from '@/lib/astro'
 import type { ReadingSection, StarBadge } from '@/lib/generateReading'
 import type { BirthInput, ChartData } from '@/stores/chartStore'
-import charResult from '@/assets/char-result.png'
 import NightSky from '@/components/NightSky'
 import TextRenderer from '@/components/TextRenderer'
+
+// 점성술 천궁도 아이콘
+function AstroIcon() {
+  return (
+    <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto mb-6 nc-breathe">
+      <circle cx="36" cy="36" r="33" stroke="#C5A028" strokeWidth="0.75" opacity="0.5"/>
+      <circle cx="36" cy="36" r="20" stroke="#C5A028" strokeWidth="0.5" opacity="0.35"/>
+      <line x1="36" y1="3" x2="36" y2="69" stroke="#C5A028" strokeWidth="0.5" opacity="0.2"/>
+      <line x1="3" y1="36" x2="69" y2="36" stroke="#C5A028" strokeWidth="0.5" opacity="0.2"/>
+      <line x1="13" y1="13" x2="59" y2="59" stroke="#C5A028" strokeWidth="0.5" opacity="0.12"/>
+      <line x1="59" y1="13" x2="13" y2="59" stroke="#C5A028" strokeWidth="0.5" opacity="0.12"/>
+      <circle cx="36" cy="4" r="2" fill="#C5A028" opacity="0.8"/>
+      <circle cx="68" cy="36" r="2" fill="#C5A028" opacity="0.8"/>
+      <circle cx="36" cy="68" r="2" fill="#C5A028" opacity="0.8"/>
+      <circle cx="4" cy="36" r="2" fill="#C5A028" opacity="0.8"/>
+      <circle cx="58" cy="14" r="1.2" fill="#C5A028" opacity="0.5"/>
+      <circle cx="14" cy="58" r="1.2" fill="#C5A028" opacity="0.5"/>
+      <text x="36" y="41" textAnchor="middle" fontSize="13" fill="#C5A028" fontFamily="serif">✦</text>
+    </svg>
+  )
+}
+
+// 공유 URL 생성 (입력값을 base64로 인코딩)
+function generateShareUrl(input: BirthInput): string {
+  const encoded = btoa(encodeURIComponent(JSON.stringify(input)))
+  return `${window.location.origin}/result?d=${encoded}`
+}
 
 const BASIC_IDS = ['appearance', 'inner', 'communication']
 const SECTION_ORDER = ['strengths', 'hiddenTalent', 'challenges', 'love', 'destinedPartner', 'career', 'lifeDirection']
@@ -72,6 +99,20 @@ function ChapterSection({ num, section }: { num: string; section: ReadingSection
 function loadResultData(search: string): { input: BirthInput; chart: ChartData } | null {
   try {
     const params = new URLSearchParams(search)
+
+    // 공유 링크: ?d=base64(input)
+    const d = params.get('d')
+    if (d) {
+      const input = JSON.parse(decodeURIComponent(atob(d))) as BirthInput
+      const chart = calculateChart(
+        input.year, input.month, input.day,
+        input.hour, input.minute,
+        input.city.lat, input.city.lng,
+      )
+      return { input, chart }
+    }
+
+    // 일반 결과: ?id=sessionStorageKey
     const id = params.get('id')
     if (id) {
       const raw = sessionStorage.getItem(`byeoljido_result_${id}`)
@@ -86,6 +127,18 @@ export default function Result() {
   const location = useLocation()
   const storeInput = useChartStore(s => s.input)
   const storeChart = useChartStore(s => s.chart)
+  const [copied, setCopied] = useState(false)
+
+  async function handleShare(input: BirthInput) {
+    const url = generateShareUrl(input)
+    if (navigator.share) {
+      await navigator.share({ title: `${input.nickname}님의 별지도`, url })
+    } else {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    }
+  }
 
   const data = useMemo(() => {
     return loadResultData(location.search) || (storeInput && storeChart ? { input: storeInput, chart: storeChart } : null)
@@ -233,17 +286,25 @@ export default function Result() {
       <footer className="px-8 text-center mt-4">
         <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Epilogue</p>
 
-        <img src={charResult} alt="" width={72} height={72} className="rounded-full mx-auto mb-6 object-cover object-top shadow-sm" />
+        <AstroIcon />
 
-        <p className="text-[16px] text-text/70 font-serif leading-loose mb-16">
+        <p className="text-[16px] text-text/70 font-serif leading-loose mb-12">
           별들은 당신을 이끄는 것이 아니라,<br />
           당신 안에 이미 존재하는 빛을<br />
           비춰주는 거울일 뿐입니다.
         </p>
 
+        {/* 공유 버튼 */}
+        <button
+          onClick={() => handleShare(input)}
+          className="w-full max-w-xs py-3 mb-3 bg-gold hover:bg-gold-dark text-white text-sm tracking-wider transition-colors cursor-pointer font-serif"
+        >
+          {copied ? '링크가 복사됐어요 ✦' : '내 결과지 공유하기'}
+        </button>
+
         <button
           onClick={() => navigate('/input')}
-          className="px-8 py-3 border border-text/30 text-text text-sm tracking-wider hover:bg-text hover:text-bg transition-colors cursor-pointer font-serif"
+          className="w-full max-w-xs py-3 border border-text/30 text-text text-sm tracking-wider hover:bg-text hover:text-bg transition-colors cursor-pointer font-serif"
         >
           다른 별지도 펼쳐보기
         </button>
