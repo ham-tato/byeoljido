@@ -87,6 +87,7 @@ export default function NightSky({ chart }: { chart: ChartData }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const interactiveSvgRef = useRef<SVGSVGElement>(null)
+  const touchRef = useRef<{ x: number; y: number; lastY: number; mode: 'undecided' | 'drag' | 'scroll' } | null>(null)
 
   const astrologyData = useMemo(() => buildAstrologyData(chart), [chart])
 
@@ -202,14 +203,45 @@ export default function NightSky({ chart }: { chart: ChartData }) {
         ref={interactiveSvgRef}
         viewBox="0 0 100 100"
         className="absolute inset-0 w-full h-full"
-        style={{ zIndex: 20, touchAction: 'auto' }}
-        onClick={(e) => {
+        style={{ zIndex: 20, touchAction: 'none' }}
+        onPointerDown={(e) => {
           if (e.pointerType === 'mouse') return
-          const idx = getSectorIdx(e.clientX, e.clientY)
-          if (idx === null) { setActiveIndex(null); return }
-          if (activeIndex === idx) { setActiveIndex(null); return }
-          setActiveIndex(idx)
+          e.currentTarget.setPointerCapture(e.pointerId)
+          touchRef.current = { x: e.clientX, y: e.clientY, lastY: e.clientY, mode: 'undecided' }
         }}
+        onPointerMove={(e) => {
+          if (e.pointerType === 'mouse' || !touchRef.current) return
+          const t = touchRef.current
+          if (t.mode === 'undecided') {
+            const dx = Math.abs(e.clientX - t.x)
+            const dy = Math.abs(e.clientY - t.y)
+            if (dx + dy < 8) return
+            t.mode = dy > dx ? 'scroll' : 'drag'
+          }
+          if (t.mode === 'scroll') {
+            window.scrollBy(0, t.lastY - e.clientY)
+            t.lastY = e.clientY
+            return
+          }
+          const idx = getSectorIdx(e.clientX, e.clientY)
+          if (idx !== null && idx !== activeIndex) setActiveIndex(idx)
+        }}
+        onPointerUp={(e) => {
+          if (e.pointerType === 'mouse' || !touchRef.current) return
+          const t = touchRef.current
+          touchRef.current = null
+          if (t.mode !== 'scroll') {
+            const dx = Math.abs(e.clientX - t.x)
+            const dy = Math.abs(e.clientY - t.y)
+            if (dx + dy < 8) {
+              const idx = getSectorIdx(e.clientX, e.clientY)
+              if (idx === null) setActiveIndex(null)
+              else if (activeIndex === idx) setActiveIndex(null)
+              else setActiveIndex(idx)
+            }
+          }
+        }}
+        onPointerCancel={() => { touchRef.current = null }}
       >
         <clipPath id="nc-sector-clip">
           <circle cx="50" cy="50" r={R_EDGE} />
