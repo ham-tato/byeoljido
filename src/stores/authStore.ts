@@ -1,13 +1,13 @@
 import { create } from 'zustand'
+import { supabase } from '@/lib/supabase'
 import type { KakaoUser } from '@/lib/kakao'
 import type { BirthInput, ChartData } from './chartStore'
 
-const STORAGE_KEY = 'byeoljido_user'
-const RESULT_KEY = (uid: number) => `byeoljido_saved_${uid}`
+const USER_KEY = 'byeoljido_user'
 
 function loadUser(): KakaoUser | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(USER_KEY)
     return raw ? JSON.parse(raw) : null
   } catch { return null }
 }
@@ -15,37 +15,48 @@ function loadUser(): KakaoUser | null {
 interface AuthStore {
   user: KakaoUser | null
   setUser: (user: KakaoUser | null) => void
-  saveResult: (input: BirthInput, chart: ChartData) => void
-  loadSavedResult: () => { input: BirthInput; chart: ChartData } | null
   clearUser: () => void
+  saveResult: (input: BirthInput, chart: ChartData) => Promise<void>
+  loadSavedResult: () => Promise<{ input: BirthInput; chart: ChartData } | null>
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: loadUser(),
 
   setUser: (user) => {
-    if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
-    else localStorage.removeItem(STORAGE_KEY)
+    if (user) localStorage.setItem(USER_KEY, JSON.stringify(user))
+    else localStorage.removeItem(USER_KEY)
     set({ user })
   },
 
-  saveResult: (input, chart) => {
+  clearUser: () => {
+    localStorage.removeItem(USER_KEY)
+    set({ user: null })
+  },
+
+  // Supabase에 결과 저장 (upsert — 같은 kakao_id면 덮어씀)
+  saveResult: async (input, chart) => {
     const { user } = get()
     if (!user) return
-    localStorage.setItem(RESULT_KEY(user.id), JSON.stringify({ input, chart }))
+    await supabase.from('results').upsert({
+      kakao_id: user.id,
+      nickname: user.nickname,
+      input,
+      chart,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'kakao_id' })
   },
 
-  loadSavedResult: () => {
+  // Supabase에서 결과 불러오기
+  loadSavedResult: async () => {
     const { user } = get()
     if (!user) return null
-    try {
-      const raw = localStorage.getItem(RESULT_KEY(user.id))
-      return raw ? JSON.parse(raw) : null
-    } catch { return null }
-  },
-
-  clearUser: () => {
-    localStorage.removeItem(STORAGE_KEY)
-    set({ user: null })
+    const { data, error } = await supabase
+      .from('results')
+      .select('input, chart')
+      .eq('kakao_id', user.id)
+      .single()
+    if (error || !data) return null
+    return { input: data.input as BirthInput, chart: data.chart as ChartData }
   },
 }))

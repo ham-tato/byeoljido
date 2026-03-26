@@ -37,8 +37,16 @@ export default function Landing() {
   const { user, setUser, loadSavedResult, clearUser } = useAuthStore()
   const { setInput, setChart } = useChartStore()
   const [loggingIn, setLoggingIn] = useState(false)
+  const [hasSaved, setHasSaved] = useState(false)
+  const [loadingPrev, setLoadingPrev] = useState(false)
 
   useEffect(() => { initKakao() }, [])
+
+  // 로그인 후 저장된 결과 있는지 확인
+  useEffect(() => {
+    if (!user) { setHasSaved(false); return }
+    loadSavedResult().then(r => setHasSaved(!!r))
+  }, [user]) // eslint-disable-line
 
   async function handleKakaoLogin() {
     setLoggingIn(true)
@@ -52,10 +60,13 @@ export default function Landing() {
   async function handleLogout() {
     await kakaoLogout()
     clearUser()
+    setHasSaved(false)
   }
 
-  function handleLoadPrevResult() {
-    const saved = loadSavedResult()
+  async function handleLoadPrevResult() {
+    setLoadingPrev(true)
+    const saved = await loadSavedResult()
+    setLoadingPrev(false)
     if (!saved) return
     const resultId = Date.now().toString(36)
     sessionStorage.setItem(`byeoljido_result_${resultId}`, JSON.stringify(saved))
@@ -63,8 +74,6 @@ export default function Landing() {
     setChart(saved.chart)
     navigate(`/result?id=${resultId}`)
   }
-
-  const savedResult = user ? loadSavedResult() : null
 
   return (
     <div className="dark-page min-h-screen flex flex-col items-center px-6 pt-20 pb-16 text-center relative overflow-hidden">
@@ -167,17 +176,18 @@ export default function Landing() {
             <p className="text-[12px] text-text-muted font-sans">
               {user.nickname}님으로 로그인됨
             </p>
-            {savedResult && (
+            {hasSaved && (
               <button
                 onClick={handleLoadPrevResult}
-                className="flex items-center gap-2 px-6 py-2.5 text-sm font-sans cursor-pointer transition-all"
+                disabled={loadingPrev}
+                className="flex items-center gap-2 px-6 py-2.5 text-sm font-sans cursor-pointer transition-all disabled:opacity-50"
                 style={{
                   background: 'rgba(197,160,40,0.15)',
                   border: '1px solid rgba(197,160,40,0.4)',
                   color: '#e2c96a',
                 }}
               >
-                ✦ 내 이전 별지도 불러오기
+                ✦ {loadingPrev ? '불러오는 중...' : '내 이전 별지도 불러오기'}
               </button>
             )}
             <button

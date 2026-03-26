@@ -150,10 +150,10 @@ export default function Result() {
     if (!data) navigate('/input')
   }, [data, navigate])
 
-  // 로그인 상태면 결과 자동 저장
+  // 로그인 상태면 결과 자동 저장 (Supabase)
   useEffect(() => {
-    if (data && user) saveResult(data.input, data.chart)
-  }, [data, user, saveResult])
+    if (data && user) { saveResult(data.input, data.chart) }
+  }, [data?.input, user?.id]) // eslint-disable-line
 
   if (!data) return <div className="min-h-screen flex items-center justify-center text-text-muted font-serif italic">별을 읽고 있습니다...</div>
   const { input, chart } = data
