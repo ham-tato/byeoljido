@@ -144,6 +144,11 @@ body {
 /* 천궁도 차트 애니메이션 */
 @keyframes nc-spin         { to { transform: rotate(360deg); }  }
 @keyframes nc-spin-reverse { to { transform: rotate(-360deg); } }
+@keyframes kakao-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
 @keyframes nc-breathe {
   0%, 100% { filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.1)) brightness(1); }
   50%       { filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.8)) brightness(1.2); }

@@ -3,22 +3,23 @@ import { useNavigate } from 'react-router-dom'
 import { initKakao, kakaoLogin, kakaoLogout } from '@/lib/kakao'
 import { useAuthStore } from '@/stores/authStore'
 import { useChartStore } from '@/stores/chartStore'
+import { supabase } from '@/lib/supabase'
 
 const FEATURES = [
   {
     symbol: '◎',
-    title: 'NASA 데이터 기반 엔진',
-    body: '당신이 태어나던 순간의 하늘을 가장 정밀하게 복원합니다',
+    title: '지금 내 삶의 흐름이 궁금할 때',
+    body: '왜 요즘 이런 감정이 드는지, 이 시기에 집중해야 할 게 뭔지 — 별지도가 지금 당신의 주기를 읽어드립니다',
   },
   {
     symbol: '✦',
-    title: '점성술의 모든 요소 반영',
-    body: '점성술을 구성하는 모든 요소를 섬세하게 엮어내어, 당신이라는 우주를 가장 입체적이고 정확하게 읽어드립니다',
+    title: '나도 몰랐던 내 매력과 약점',
+    body: '겉으로 드러나는 모습 너머, 당신이 타고난 강점과 숨겨진 재능 그리고 반복되는 패턴까지 짚어드립니다',
   },
   {
     symbol: '◈',
-    title: '개인화된 결과지',
-    body: '1,400개 이상의 유형을 분석해 개인 맞춤형 결과지를 제공합니다',
+    title: '사랑과 일, 둘 다 봐드립니다',
+    body: '당신의 연애 방식, 끌리는 상대의 유형, 잘 맞는 일의 종류까지 — 1,400개 이상의 유형으로 분석합니다',
   },
 ]
 
@@ -39,22 +40,36 @@ export default function Landing() {
   const [loggingIn, setLoggingIn] = useState(false)
   const [hasSaved, setHasSaved] = useState(false)
   const [loadingPrev, setLoadingPrev] = useState(false)
+  const [authReady, setAuthReady] = useState(false)
 
   useEffect(() => { initKakao() }, [])
+
+  // 세션 확인 + OAuth 로그인 완료 시 입력폼으로 이동
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'INITIAL_SESSION') setAuthReady(true)
+      if (event === 'SIGNED_IN') navigate('/input')
+    })
+    return () => subscription.unsubscribe()
+  }, [navigate])
+
+  const TEST_ACCOUNT = '510rudwls@naver.com'
 
   // 로그인 후 저장된 결과 있는지 확인
   useEffect(() => {
     if (!user) { setHasSaved(false); return }
+    if (user.email === TEST_ACCOUNT) { setHasSaved(false); return }
     loadSavedResult().then(r => setHasSaved(!!r))
   }, [user]) // eslint-disable-line
 
   async function handleKakaoLogin() {
     setLoggingIn(true)
     try {
-      const kakaoUser = await kakaoLogin()
-      setUser(kakaoUser)
-    } catch { /* 사용자가 로그인 취소 */ }
-    setLoggingIn(false)
+      await kakaoLogin() // 카카오로 리다이렉트 — 이후 코드 실행 안 됨
+    } catch (err) {
+      console.error('[카카오 로그인 에러]', err)
+      setLoggingIn(false)
+    }
   }
 
   async function handleLogout() {
@@ -79,7 +94,7 @@ export default function Landing() {
     <div className="dark-page min-h-screen flex flex-col items-center px-6 pt-20 pb-16 text-center relative overflow-hidden">
 
       {/* 별 배경 */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+      <div className="absolute inset-0" style={{ pointerEvents: 'none' }} aria-hidden>
         {STARS.map(s => (
           <div
             key={s.id}
@@ -114,8 +129,8 @@ export default function Landing() {
       {/* 메인 카피 */}
       <div className="max-w-sm mx-auto mb-12 relative">
         <h1 className="gold-gradient-text leading-[1.3] mb-8" style={{ fontFamily: "'SokchoBadaBatang', serif", fontWeight: 'normal', fontSize: 'clamp(1.6rem, 7.5vw, 2.6rem)' }}>
-          당신이 태어나던 순간<br />
-          하늘이 남긴 기록
+          당신이 태어나던 순간,<br />
+          별이 그린 지도
         </h1>
 
         <div className="flex items-center justify-center gap-3 mb-8">
@@ -125,69 +140,125 @@ export default function Landing() {
         </div>
 
         <p className="text-text-muted text-[15px] leading-relaxed">
-          별지도는 당신이 태어난 순간의<br />
-          하늘을 읽어드립니다.
+          숨겨진 매력, 사랑의 방식, 일의 재능,<br />
+          그리고 지금 이 시기에 무엇을 해야 하는지.<br />
+          별이 이미 알고 있습니다.
         </p>
       </div>
 
       {/* CTA 버튼 그룹 */}
-      <div className="flex flex-col items-center gap-3 relative">
-
-        {/* 메인 CTA */}
-        <button
-          onClick={() => navigate('/input')}
-          className="group relative flex items-center gap-3 px-8 py-4 text-text text-sm tracking-wider transition-all duration-300 font-sans cursor-pointer"
-          style={{
-            background: 'rgba(255,255,255,0.06)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(197,160,40,0.3)',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.background = 'rgba(197,160,40,0.1)'
-            ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.6)'
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'
-            ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.3)'
-          }}
-        >
-          <span>내 별지도 펼쳐보기</span>
-          <span className="text-gold/70 transition-transform duration-300 group-hover:translate-x-1">→</span>
-        </button>
+      <div className="flex flex-col items-center gap-3 relative" style={{ zIndex: 10, minHeight: '60px' }}>
 
         {/* 로그인 / 이전 결과 */}
-        {!user ? (
-          <button
-            onClick={handleKakaoLogin}
-            disabled={loggingIn}
-            className="flex items-center gap-2 px-6 py-2.5 rounded text-sm font-sans cursor-pointer transition-opacity hover:opacity-80 disabled:opacity-50"
-            style={{ background: '#FEE500', color: '#000000CC' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path fillRule="evenodd" clipRule="evenodd"
-                d="M9 1.5C4.86 1.5 1.5 4.19 1.5 7.5c0 2.08 1.23 3.91 3.09 5.01l-.79 2.94a.28.28 0 0 0 .42.3L7.5 13.8c.49.07.99.1 1.5.1 4.14 0 7.5-2.69 7.5-6S13.14 1.5 9 1.5z"
-                fill="#000000CC"/>
-            </svg>
-            {loggingIn ? '로그인 중...' : '카카오로 로그인'}
-          </button>
-        ) : (
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-[12px] text-text-muted font-sans">
-              {user.nickname}님으로 로그인됨
-            </p>
-            {hasSaved && (
-              <button
-                onClick={handleLoadPrevResult}
-                disabled={loadingPrev}
-                className="flex items-center gap-2 px-6 py-2.5 text-sm font-sans cursor-pointer transition-all disabled:opacity-50"
+        {!authReady ? null : (!user ? (
+          <div className="relative" style={{ animation: 'kakao-float 2.8s ease-in-out infinite', position: 'relative', zIndex: 9999 }}>
+            {/* 말풍선 "3초!" */}
+            <div
+              className="absolute -top-7 -left-1 text-[11px] font-bold px-2 py-0.5 rounded-full leading-tight pointer-events-none"
+              style={{
+                background: 'rgba(197,160,40,0.15)',
+                color: '#C5A028',
+                border: '1px solid rgba(197,160,40,0.5)',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+              }}
+            >
+              3초!
+              {/* 말풍선 꼬리 */}
+              <span
+                className="absolute left-3 -bottom-1.5"
                 style={{
-                  background: 'rgba(197,160,40,0.15)',
-                  border: '1px solid rgba(197,160,40,0.4)',
-                  color: '#e2c96a',
+                  width: 0, height: 0,
+                  borderLeft: '5px solid transparent',
+                  borderRight: '5px solid transparent',
+                  borderTop: '6px solid #C5A028',
+                  display: 'block',
+                }}
+              />
+            </div>
+            <button
+              onClick={handleKakaoLogin}
+              disabled={loggingIn}
+              className="flex items-center gap-2 px-6 py-2.5 rounded text-sm font-sans cursor-pointer transition-opacity hover:opacity-80 disabled:opacity-50"
+              style={{ background: '#FEE500', color: '#000000CC' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path fillRule="evenodd" clipRule="evenodd"
+                  d="M9 1.5C4.86 1.5 1.5 4.19 1.5 7.5c0 2.08 1.23 3.91 3.09 5.01l-.79 2.94a.28.28 0 0 0 .42.3L7.5 13.8c.49.07.99.1 1.5.1 4.14 0 7.5-2.69 7.5-6S13.14 1.5 9 1.5z"
+                  fill="#000000CC"/>
+              </svg>
+              {loggingIn ? '로그인 중...' : '카카오톡으로 로그인하기'}
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3">
+            {hasSaved ? (
+              <>
+                <button
+                  onClick={handleLoadPrevResult}
+                  disabled={loadingPrev}
+                  className="group relative flex items-center gap-3 px-8 py-4 text-text text-sm tracking-wider transition-all duration-300 font-sans cursor-pointer disabled:opacity-50"
+                  style={{
+                    background: 'rgba(197,160,40,0.12)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(197,160,40,0.4)',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(197,160,40,0.2)'
+                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.7)'
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(197,160,40,0.12)'
+                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.4)'
+                  }}
+                >
+                  <span className="text-gold/80">✦</span>
+                  <span>{loadingPrev ? '불러오는 중...' : '내 결과지 불러오기'}</span>
+                  <span className="text-gold/70 transition-transform duration-300 group-hover:translate-x-1">→</span>
+                </button>
+                <button
+                  onClick={() => navigate('/input')}
+                  className="group relative flex items-center gap-3 px-8 py-4 text-text text-sm tracking-wider transition-all duration-300 font-sans cursor-pointer"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(197,160,40,0.2)',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(197,160,40,0.08)'
+                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.5)'
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'
+                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.2)'
+                  }}
+                >
+                  <span>새로운 별지도 펼쳐보기</span>
+                  <span className="text-gold/70 transition-transform duration-300 group-hover:translate-x-1">→</span>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate('/input')}
+                className="group relative flex items-center gap-3 px-8 py-4 text-text text-sm tracking-wider transition-all duration-300 font-sans cursor-pointer"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(197,160,40,0.3)',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(197,160,40,0.1)'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.6)'
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.3)'
                 }}
               >
-                ✦ {loadingPrev ? '불러오는 중...' : '내 이전 별지도 불러오기'}
+                <span>내 별지도 펼쳐보기</span>
+                <span className="text-gold/70 transition-transform duration-300 group-hover:translate-x-1">→</span>
               </button>
             )}
             <button
@@ -197,7 +268,7 @@ export default function Landing() {
               로그아웃
             </button>
           </div>
-        )}
+        ))}
       </div>
 
       {/* 피처 섹션 */}
@@ -222,7 +293,7 @@ export default function Landing() {
           >
             <span className="text-gold/70 text-xl mt-0.5 shrink-0 leading-none">{f.symbol}</span>
             <div>
-              <p className="text-[13px] font-serif text-text mb-1">{f.title}</p>
+              <p className="text-[13px] font-sans font-bold text-text mb-1">{f.title}</p>
               <p className="text-[12px] text-text-muted leading-relaxed">{f.body}</p>
             </div>
           </div>

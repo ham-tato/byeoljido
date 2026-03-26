@@ -176,11 +176,22 @@ export default function InputForm() {
         </div>
 
         {/* 프로그레스 바 */}
-        <div className="w-full max-w-[260px] h-px bg-border overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-gold/40 to-gold transition-all duration-1000 ease-in-out"
-            style={{ width: `${(loadingStep / (LOADING_STEPS.length - 1)) * 100}%` }}
-          />
+        <div className="w-full max-w-[260px] mt-2">
+          {/* 트랙 */}
+          <div className="relative h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(197,160,40,0.15)' }}>
+            <div
+              className="absolute left-0 top-0 h-full rounded-full transition-all duration-1000 ease-in-out"
+              style={{
+                width: `${(loadingStep / (LOADING_STEPS.length - 1)) * 100}%`,
+                background: 'linear-gradient(to right, #9A7B1A, #C5A028, #e2c96a)',
+                boxShadow: '0 0 8px rgba(197,160,40,0.6)',
+              }}
+            />
+          </div>
+          {/* 퍼센트 */}
+          <p className="text-right text-[11px] mt-1.5 font-display" style={{ color: 'rgba(197,160,40,0.7)' }}>
+            {Math.round((loadingStep / (LOADING_STEPS.length - 1)) * 100)}%
+          </p>
         </div>
       </div>
     )

@@ -292,8 +292,8 @@ export default function NightSky({ chart }: { chart: ChartData }) {
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full backdrop-blur-md flex flex-col items-center justify-center text-center"
         style={{
-          width: '30%',
-          height: '30%',
+          width: '34%',
+          height: '34%',
           zIndex: 40,
           background: activeItem ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.6)',
           border: `1px solid ${activeItem ? 'rgba(212,175,55,0.7)' : 'rgba(212,175,55,0.3)'}`,
@@ -309,13 +309,13 @@ export default function NightSky({ chart }: { chart: ChartData }) {
         onClick={() => { if (activeItem) { setActiveIndex(null); setIsPressing(false) } }}
       >
         {activeItem ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', width: '100%', minHeight: 0, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px', width: '100%', minHeight: 0, overflow: 'hidden' }}>
             {/* 하우스명 */}
             <span style={{
               color: '#9CA3AF',
               fontSize: 'clamp(11px, 3.2vw, 13px)',
               borderBottom: '1px solid rgba(75,85,99,0.5)',
-              paddingBottom: '3px',
+              paddingBottom: '2px',
               width: '85%',
               textAlign: 'center',
             }}>
@@ -351,7 +351,7 @@ export default function NightSky({ chart }: { chart: ChartData }) {
             <div style={{
               display: 'flex', alignItems: 'center', gap: '4px',
               borderTop: '1px solid rgba(75,85,99,0.3)',
-              paddingTop: '3px',
+              paddingTop: '2px',
               width: '85%',
               justifyContent: 'center',
             }}>
@@ -368,7 +368,7 @@ export default function NightSky({ chart }: { chart: ChartData }) {
               color: 'rgba(156,163,175,0.5)',
               fontSize: 'clamp(8px, 2vw, 10px)',
               letterSpacing: '0.05em',
-              marginTop: '2px',
+              marginTop: '1px',
             }}>
               눌러서 닫기
             </span>

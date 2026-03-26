@@ -1,52 +1,25 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-const KAKAO_JS_KEY = '3f31a86960a09410082a4290b863ccb1'
-
-declare global {
-  interface Window {
-    Kakao: any
-  }
-}
+import { supabase } from './supabase'
 
 export interface KakaoUser {
-  id: number
+  id: string
   nickname: string
+  email?: string
   profileImage?: string
 }
 
-export function initKakao() {
-  if (window.Kakao && !window.Kakao.isInitialized()) {
-    window.Kakao.init(KAKAO_JS_KEY)
-  }
-}
+export function initKakao() { /* Supabase OAuth가 처리함 */ }
 
-export function kakaoLogin(): Promise<KakaoUser> {
-  return new Promise((resolve, reject) => {
-    window.Kakao.Auth.login({
-      success: () => {
-        window.Kakao.API.request({
-          url: '/v2/user/me',
-          success: (res: any) => {
-            resolve({
-              id: res.id,
-              nickname: res.kakao_account?.profile?.nickname ?? '별지도 사용자',
-              profileImage: res.kakao_account?.profile?.thumbnail_image_url,
-            })
-          },
-          fail: reject,
-        })
-      },
-      fail: reject,
-    })
+export async function kakaoLogin(): Promise<void> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'kakao',
+    options: {
+      redirectTo: window.location.origin,
+      scopes: '',
+    },
   })
+  if (error) throw error
 }
 
-export function kakaoLogout(): Promise<void> {
-  return new Promise((resolve) => {
-    window.Kakao.Auth.logout(() => resolve())
-  })
-}
-
-export function isKakaoLoggedIn(): boolean {
-  return !!(window.Kakao?.Auth?.getAccessToken())
+export async function kakaoLogout(): Promise<void> {
+  await supabase.auth.signOut()
 }

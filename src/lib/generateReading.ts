@@ -43,6 +43,26 @@ function getElementMetaphor(sign: string) {
   return SIGN_ELEMENT[sign] || { element: '?', metaphor: sign, keyword: sign }
 }
 
+// 태양+달 원소 조합 → "이거 나잖아" 포인트
+const SUN_MOON_HIT: Record<string, string> = {
+  '불-불': '겉도 속도 뜨겁고, 꽂히면 폭발적으로 달려드는 타입이에요. 다만 "나 왜 이렇게 쉽게 질리지?"라는 생각을 혼자 몇 번 해봤을 거예요. 열정이 빠르게 치솟는 만큼 식는 속도도 빠르거든요.',
+  '불-물': '친구들은 잘 모르지만, 당신 혼자 옛날 기억 떠올리다 울컥하는 날이 생각보다 많아요. 겉으로는 앞만 보고 달리는 사람인데, 안에서는 감수성이 조용히 넘쳐흐르는 모순이 공존하고 있어요.',
+  '불-흙': '충동적으로 시작해 놓고 막상 닥치면 "이거 되긴 할까" 걱정이 몰려오는 패턴, 익숙하지 않나요? 행동은 빠른데 내면은 의외로 신중하고 안정을 원해요.',
+  '불-바람': '머리와 몸이 동시에 달리는 타입이에요. 아이디어도 많고 추진력도 있는데, 정작 중요한 것 하나를 끝까지 마무리하는 게 생각보다 어렵게 느껴질 거예요.',
+  '물-불': '겉으로는 참는데 안에서는 이미 끓고 있는 상태. "왜 말 못 하고 혼자 끙끙 앓다가 나중에 폭발하지"라는 패턴을 스스로도 이미 알고 있을 거예요.',
+  '물-물': '공감 능력이 너무 뛰어나서 주변 사람의 에너지에 크게 영향받아요. 에너지 드레인 당한 날엔 아무것도 하기 싫어지는 게 당연한 반응이에요. 혼자 있는 시간이 필수인 이유가 여기 있어요.',
+  '물-흙': '감성적으로 보이지만 사실 현실적인 거 엄청 따지는 편이에요. "이 사람 믿어도 되나?" 판단할 때 감정보다 행동 패턴을 더 오래 관찰하는 스타일이에요.',
+  '물-바람': '"이 감정이 맞는 건가?" 계속 머리로 따져보다가 정작 감정을 즐기지 못하는 경우가 생겨요. 이성과 감정이 자주 충돌하는 게 이 배치의 특징이에요.',
+  '흙-불': '겉은 침착하고 신중한데 속에는 의외의 열정과 야망이 있어요. 천천히 가는 것처럼 보이지만 실제로는 내면에서 빠르게 달리고 싶은 충동을 꾹 눌러두고 있어요.',
+  '흙-물': '남들한테는 "너 되게 강하고 현실적인 사람이다"라는 말을 자주 듣지만, 실제로는 사소한 말 한마디에 꽤 깊이 상처받는 편이에요. 그걸 티 안 내는 것뿐이에요.',
+  '흙-흙': '리스크 있는 선택 앞에서 "그래도 이건 좀 아니지 않아?"라며 몇 번이고 재고하는 신중파예요. 느리게 보여도 한번 결정하면 끝까지 가는 사람이에요.',
+  '흙-바람': '안정을 원하면서도 같은 것이 반복되면 지루해지는 묘한 딜레마를 안고 살아요. "변화는 싫은데 지금 이대로도 좀 답답해"라는 감각이 익숙할 거예요.',
+  '바람-불': '"시작은 잘 하는데 왜 끝은 항상 흐지부지"라는 패턴이 반복되는 편이에요. 아이디어와 열정은 넘치는데, 마무리 단계에서 에너지가 다른 곳으로 흩어지거든요.',
+  '바람-물': '"이건 논리적으로 맞는데 왜 기분이 이상하지"라는 내적 갈등이 익숙할 거예요. 이성으로 판단하려 해도 감정이 자꾸 끼어드는 구조예요.',
+  '바람-흙': '겉으로는 자유롭고 독립적으로 보이지만, 실제로는 확실하고 믿을 수 있는 것에 강하게 끌리는 편이에요. 불안정한 상황을 겉으론 쿨하게 대응하면서 속으로는 꽤 신경 쓰거든요.',
+  '바람-바람': '생각이 너무 많아서 "이래도 되나 저래도 되나" 하다가 결정을 못 내리거나, 내리고 나서도 "이게 맞나" 계속 되짚어보는 경우가 있어요. 머릿속이 항상 과부하 상태예요.',
+}
+
 // 별자리별 외면/내면 페르소나 (한 줄 요약용)
 const SIGN_PERSONA: Record<string, { outer: string; inner: string }> = {
   '양자리':    { outer: '선두주자',    inner: '충동적 개척자'  },
@@ -80,6 +100,9 @@ function generateChartSummary(chart: ChartData, nickname: string): { title: stri
     title = `${ascPersona}의 가면, 본질은 ${sunPersona}`
   }
 
+  const sunMoonKey = `${sun.element}-${moon.element}`
+  const hitPoint = SUN_MOON_HIT[sunMoonKey] || ''
+
   const body =
     `${nickname}님이 태어난 날, 하늘의 별들은 아주 특별한 그림을 그리고 있었어요. ` +
     `가장 중요한 자아를 뜻하는 **태양**은 ${sun.metaphor}의 기운을 가진 **${sunSign}**에 머물렀어요. ` +
@@ -88,7 +111,8 @@ function generateChartSummary(chart: ChartData, nickname: string): { title: stri
     `여기에 깊은 내면을 상징하는 **달**은 ${moon.metaphor}의 기운을 가진 **${moonSign}**에 머물고 있었네요. ` +
     `정리하면, ${nickname}님은 겉으로는 **${asc.keyword}**${eulReul(asc.keyword)} 보여주면서, ` +
     `중심에는 **${sun.keyword}**${iGa(sun.keyword)} 단단하게 자리 잡고, ` +
-    `내면 깊은 곳에서는 **${moon.keyword}**${iGa(moon.keyword)} 조용히 흐르는 사람이에요.`
+    `내면 깊은 곳에서는 **${moon.keyword}**${iGa(moon.keyword)} 조용히 흐르는 사람이에요.` +
+    (hitPoint ? `\n\n${hitPoint}` : '')
 
   return { title, body }
 }
@@ -228,30 +252,13 @@ function generateLove(chart: ChartData): ReadingSection {
   const house = HOUSE_CONTEXT[venus.house]
   const text = VENUS_IN_SIGN[venus.sign] || ''
 
-  // 금성 관련 부정 애스펙트가 있으면 추가
-  const venusAspects = chart.aspects.filter(a =>
-    (a.planet1 === '금성' || a.planet2 === '금성') &&
-    (a.type === 'square' || a.type === 'opposition')
-  )
-
-  let extraText = ''
-  if (venusAspects.length > 0) {
-    const asp = venusAspects[0]
-    const otherPlanet = asp.planet1 === '금성' ? asp.planet2 : asp.planet1
-    const key = getAspectKey('금성', otherPlanet)
-    const template = NEGATIVE_ASPECTS[key]
-    if (template) {
-      extraText = '\n\n' + template.body
-    }
-  }
-
   return {
     id: 'love',
     title: '사랑과 관계의 방정식',
     subtitle: LOVE_SUBTITLE[venus.sign],
     badges: [{ symbol: '♀', label: '금성', sign: venus.sign, house: venus.house }],
     starMovement: `연애와 관계를 주관하는 금성이 ${venus.sign}에, 그리고 ${house?.area || `${venus.house}하우스`}인 ${venus.house}하우스에 머물고 있습니다.`,
-    body: text + extraText,
+    body: text,
   }
 }
 

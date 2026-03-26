@@ -8,6 +8,7 @@ import type { ReadingSection, StarBadge } from '@/lib/generateReading'
 import type { BirthInput, ChartData } from '@/stores/chartStore'
 import NightSky from '@/components/NightSky'
 import TextRenderer from '@/components/TextRenderer'
+import LifeCycleGraph from '@/components/LifeCycleGraph'
 
 // 점성술 천궁도 아이콘
 function AstroIcon() {
@@ -281,7 +282,43 @@ export default function Result() {
         </div>
 
         {otherSections.filter(s => ['career', 'lifeDirection'].includes(s.id)).map((section, i) => (
-          <ChapterSection key={section.id} num={romanNumerals[i + 8]} section={section} />
+          section.id === 'lifeDirection' ? (
+            <div key={section.id} className="mb-24">
+              {/* 챕터 넘버 + 제목 */}
+              <div className="mb-6">
+                <span className="chapter-num text-6xl">{romanNumerals[i + 8]}</span>
+                <h3 className="text-2xl font-serif text-text mt-3 mb-2">{section.title}</h3>
+                {section.subtitle && (
+                  <p className="text-[15px] text-text-muted leading-relaxed italic">
+                    — {section.subtitle}
+                  </p>
+                )}
+              </div>
+
+              <LifeCycleGraph birthYear={input.year} />
+
+              {/* 구분 */}
+              <div className="flex items-center gap-3 mt-10 mb-8">
+                <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(197,160,40,0.3))' }} />
+                <span className="text-[10px] tracking-[0.25em] uppercase text-text-muted/50 font-display">삶의 방향 나침반</span>
+                <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(197,160,40,0.3))' }} />
+              </div>
+
+              {/* 천문 근거 */}
+              <div className="border-l border-gold/40 pl-4 mb-8">
+                {section.badges && section.badges.length > 0 && (
+                  <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3">
+                    {section.badges.map((b, i) => <BadgeItem key={i} badge={b} />)}
+                  </div>
+                )}
+                <p className="text-[13px] text-text-muted/70 leading-relaxed italic">{section.starMovement}</p>
+              </div>
+
+              <BodyText text={section.body} />
+            </div>
+          ) : (
+            <ChapterSection key={section.id} num={romanNumerals[i + 8]} section={section} />
+          )
         ))}
       </section>
 
@@ -304,14 +341,14 @@ export default function Result() {
         {/* 공유 버튼 */}
         <button
           onClick={() => handleShare(input)}
-          className="w-full max-w-xs py-3 mb-3 bg-gold hover:bg-gold-dark text-white text-sm tracking-wider transition-colors cursor-pointer font-serif"
+          className="w-full max-w-xs py-3 mb-3 bg-gold hover:bg-gold-dark text-white text-sm tracking-wider transition-colors cursor-pointer font-sans"
         >
           {copied ? '링크가 복사됐어요 ✦' : '내 결과지 공유하기'}
         </button>
 
         <button
           onClick={() => navigate('/input')}
-          className="w-full max-w-xs py-3 border border-text/30 text-text text-sm tracking-wider hover:bg-text hover:text-bg transition-colors cursor-pointer font-serif"
+          className="w-full max-w-xs py-3 border border-text/30 text-text text-sm tracking-wider hover:bg-text hover:text-bg transition-colors cursor-pointer font-sans"
         >
           다른 별지도 펼쳐보기
         </button>
