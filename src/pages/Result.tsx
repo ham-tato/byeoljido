@@ -298,10 +298,9 @@ export default function Result() {
               <LifeCycleGraph birthYear={input.year} />
 
               {/* 구분 */}
-              <div className="flex items-center gap-3 mt-10 mb-8">
-                <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(197,160,40,0.3))' }} />
-                <span className="text-[10px] tracking-[0.25em] uppercase text-text-muted/50 font-display">삶의 방향 나침반</span>
-                <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(197,160,40,0.3))' }} />
+              <div className="mt-10 mb-6">
+                <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-1 font-display">북교점이 말하는</p>
+                <h4 className="text-xl font-serif text-text">이번 생에서 나아가야 할 방향</h4>
               </div>
 
               {/* 천문 근거 */}
