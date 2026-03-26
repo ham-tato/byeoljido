@@ -70,7 +70,7 @@ export default function Landing() {
       {/* 메인 카피 */}
       <div className="max-w-sm mx-auto mb-12 relative">
         <h1 className="gold-gradient-text font-serif text-[2.6rem] leading-[1.25] mb-8">
-          태어나던 순간,<br />
+          당신이 태어나던 순간<br />
           하늘이 남긴 기록
         </h1>
 
