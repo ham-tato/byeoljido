@@ -4,7 +4,14 @@ import { useChartStore } from '@/stores/chartStore'
 import { calculateChart } from '@/lib/astro'
 import CitySearch from '@/components/CitySearch'
 import type { City } from '@/stores/chartStore'
-import charLoading from '@/assets/char-loading.png'
+
+const LOADING_STEPS = [
+  { label: '출생 데이터 수신', detail: 'Receiving birth data' },
+  { label: '행성 위치 계산', detail: 'Calculating planetary positions' },
+  { label: '하우스 배치 분석', detail: 'Analyzing house placements' },
+  { label: '어스펙트 해석', detail: 'Interpreting aspects & angles' },
+  { label: '별지도 생성 완료', detail: 'Chart generation complete' },
+]
 
 function loadFormDraft() {
   try {
@@ -30,12 +37,26 @@ export default function InputForm() {
   const [minute, setMinute] = useState(draftRef.current?.minute || '')
   const [city, setCity] = useState<City | null>(draftRef.current?.city || null)
   const [isLoading, setIsLoading] = useState(false)
+  const [loadingStep, setLoadingStep] = useState(0)
   const [error, setError] = useState('')
 
   // 입력할 때마다 localStorage에 저장
   useEffect(() => {
     saveFormDraft({ nickname, year, month, day, hour, minute, city })
   }, [nickname, year, month, day, hour, minute, city])
+
+  // 로딩 중 단계별 진행
+  useEffect(() => {
+    if (!isLoading) return
+    setLoadingStep(0)
+    const timers = [
+      setTimeout(() => setLoadingStep(1), 1000),
+      setTimeout(() => setLoadingStep(2), 2000),
+      setTimeout(() => setLoadingStep(3), 3200),
+      setTimeout(() => setLoadingStep(4), 4400),
+    ]
+    return () => timers.forEach(clearTimeout)
+  }, [isLoading])
 
   const currentYear = new Date().getFullYear()
 
@@ -65,7 +86,7 @@ export default function InputForm() {
     setIsLoading(true)
     setError('')
 
-    // 로딩 연출을 위해 약간의 딜레이
+    // 로딩 연출을 위한 딜레이 (5초)
     setTimeout(() => {
       try {
         const input = {
@@ -95,26 +116,71 @@ export default function InputForm() {
         setError('차트 계산 중 오류가 발생했습니다. 입력 정보를 확인해주세요.')
         setIsLoading(false)
       }
-    }, 2000)
+    }, 5000)
   }
 
-  // 로딩 화면
+  // 로딩 화면 — 결과지 표지 스타일
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4">
-        <div className="w-72 md:w-80 mx-auto mb-6">
-          <img
-            src={charLoading}
-            alt="별을 분석하는 중"
-            className="w-full h-auto rounded-2xl shadow-2xl shadow-accent/20 animate-pulse"
-          />
+      <div className="min-h-screen flex flex-col items-center justify-center px-8">
+        {/* 상단 레이블 */}
+        <p className="text-[10px] text-text-muted tracking-[0.3em] uppercase mb-10 font-display">
+          Generating Celestial Portrait
+        </p>
+
+        {/* 타이틀 */}
+        <h1
+          className="text-3xl text-text mb-2 leading-snug text-center"
+          style={{ fontFamily: "'Cafe24Classictype', cursive" }}
+        >
+          {nickname}님의 별지도
+        </h1>
+
+        {/* 골드 구분선 */}
+        <div className="flex items-center justify-center gap-3 my-5">
+          <div className="w-10 h-px bg-gold/50" />
+          <span className="text-gold text-xs">✦</span>
+          <div className="w-10 h-px bg-gold/50" />
         </div>
-        <p className="text-accent font-medium text-lg mb-2">별을 읽고 있어요...</p>
-        <p className="text-text-muted text-sm">{nickname}님이 태어나던 순간의 하늘을 복원하고 있습니다</p>
-        <div className="mt-6 flex gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-2 h-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '300ms' }} />
+
+        {/* 출생 정보 */}
+        <p className="text-sm text-text-muted text-center mb-12 leading-relaxed">
+          {year}년 {month}월 {day}일&ensp;
+          {String(parseInt(hour)).padStart(2, '0')}시 {String(parseInt(minute)).padStart(2, '0')}분
+          <br />
+          <span className="text-xs">{city?.name}, {city?.country}</span>
+        </p>
+
+        {/* 진행 단계 */}
+        <div className="w-full max-w-[260px] space-y-4 mb-8">
+          {LOADING_STEPS.map((step, i) => {
+            const done = i < loadingStep
+            const active = i === loadingStep
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-3 transition-all duration-500 ${done || active ? 'opacity-100' : 'opacity-20'}`}
+              >
+                <span className={`text-xs w-4 text-center shrink-0 ${done ? 'text-gold' : active ? 'text-gold animate-pulse' : 'text-text-muted'}`}>
+                  {done ? '✦' : active ? '◈' : '◇'}
+                </span>
+                <p className={`text-sm flex-1 ${done || active ? 'text-text' : 'text-text-muted'}`}>
+                  {step.label}
+                </p>
+                {done && (
+                  <span className="text-[10px] text-gold/60 tracking-wider font-display">Done</span>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* 프로그레스 바 */}
+        <div className="w-full max-w-[260px] h-px bg-border overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-gold/40 to-gold transition-all duration-1000 ease-in-out"
+            style={{ width: `${(loadingStep / (LOADING_STEPS.length - 1)) * 100}%` }}
+          />
         </div>
       </div>
     )

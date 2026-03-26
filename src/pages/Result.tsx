@@ -51,17 +51,17 @@ function ChapterSection({ num, section }: { num: string; section: ReadingSection
         )}
       </div>
 
-      {/* 천문 근거 */}
-      {section.badges && section.badges.length > 0 && (
-        <div className="flex flex-wrap gap-x-5 gap-y-1 mb-5 border-l border-gold/40 pl-4">
-          {section.badges.map((b, i) => <BadgeItem key={i} badge={b} />)}
-        </div>
-      )}
-
-      {/* 별의 움직임 */}
-      <p className="text-[13px] text-text-muted/70 leading-relaxed mb-8 italic pl-4 border-l border-border">
-        {section.starMovement}
-      </p>
+      {/* 천문 근거 + 별의 움직임 (좌측 구분선 연결) */}
+      <div className="border-l border-gold/40 pl-4 mb-8">
+        {section.badges && section.badges.length > 0 && (
+          <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3">
+            {section.badges.map((b, i) => <BadgeItem key={i} badge={b} />)}
+          </div>
+        )}
+        <p className="text-[13px] text-text-muted/70 leading-relaxed italic">
+          {section.starMovement}
+        </p>
+      </div>
 
       {/* 본문 */}
       <BodyText text={section.body} />
@@ -117,7 +117,7 @@ export default function Result() {
           A Celestial Portrait
         </p>
 
-        <h1 className="font-serif text-4xl text-text mb-3 leading-snug">
+        <h1 className="text-4xl text-text mb-3 leading-snug" style={{ fontFamily: "'Cafe24Classictype', cursive" }}>
           {input.nickname}님의 별지도
         </h1>
 

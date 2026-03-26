@@ -1,11 +1,43 @@
 @import "tailwindcss";
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+
+@font-face {
+  font-family: 'Cafe24Classictype';
+  src: url('/fonts/Cafe24Classictype.woff2') format('woff2'),
+       url('/fonts/Cafe24Classictype.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'KoPubWorldBatang';
+  src: url('/fonts/KoPubWorldBatangBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'KoPubWorldDotum';
+  src: url('/fonts/KoPubWorldDotumMedium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SokchoBadaBatang';
+  src: url('/fonts/SokchoBadaBatang.woff2') format('woff2'),
+       url('/fonts/SokchoBadaBatang.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 @theme {
-  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-serif: 'Noto Serif KR', serif;
-  --font-display: 'Cormorant Garamond', 'Noto Serif KR', serif;
+  --font-sans: 'KoPubWorldDotum', 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --font-serif: 'KoPubWorldBatang', 'SokchoBadaBatang', serif;
+  --font-display: 'KoPubWorldBatang', 'SokchoBadaBatang', serif;
   --color-primary: #6366f1;
   --color-primary-dark: #4f46e5;
   --color-bg: #F7F5F0;
@@ -24,6 +56,8 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 * {
@@ -47,9 +81,20 @@ body {
   background: linear-gradient(to right, transparent, var(--color-border), transparent);
 }
 
+/* 천궁도 차트 애니메이션 */
+@keyframes nc-spin         { to { transform: rotate(360deg); }  }
+@keyframes nc-spin-reverse { to { transform: rotate(-360deg); } }
+@keyframes nc-breathe {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.1)) brightness(1); }
+  50%       { filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.8)) brightness(1.2); }
+}
+.nc-spin         { animation: nc-spin 180s linear infinite;         transform-box: fill-box; transform-origin: center; }
+.nc-spin-reverse { animation: nc-spin-reverse 240s linear infinite; transform-box: fill-box; transform-origin: center; }
+.nc-breathe      { animation: nc-breathe 2.5s ease-in-out infinite; }
+
 /* 챕터 드롭캡 스타일 넘버링 */
 .chapter-num {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'KoPubWorld바탕체Bold', 'SokchoBadaBatang', serif;
   font-weight: 700;
   font-style: italic;
   color: var(--color-gold);
