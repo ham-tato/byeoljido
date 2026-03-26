@@ -11,7 +11,7 @@ export default function Intro() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="dark-page min-h-screen flex flex-col">
       <main className="flex-1 max-w-md mx-auto w-full px-8 pt-24 pb-16">
 
         {/* 상단 장식 */}

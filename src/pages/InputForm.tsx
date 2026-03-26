@@ -119,10 +119,10 @@ export default function InputForm() {
     }, 5000)
   }
 
-  // 로딩 화면 — 결과지 표지 스타일
+  // 로딩 화면 — 결과지 표지 스타일 (라이트 톤, 페이드인)
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-8">
+      <div className="animate-fade-in-light min-h-screen flex flex-col items-center justify-center px-8 bg-[#F7F5F0] text-[#2c2418]">
         {/* 상단 레이블 */}
         <p className="text-[10px] text-text-muted tracking-[0.3em] uppercase mb-10 font-display">
           Generating Celestial Portrait
@@ -187,7 +187,7 @@ export default function InputForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="dark-page min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-text mb-2">당신의 별을 읽어드릴게요</h1>
