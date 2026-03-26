@@ -89,7 +89,7 @@ export default function Landing() {
       {/* CTA — glassmorphism */}
       <button
         onClick={() => navigate('/input')}
-        className="group relative flex items-center gap-3 px-8 py-4 text-text text-sm tracking-wider transition-all duration-300 font-serif cursor-pointer"
+        className="group relative flex items-center gap-3 px-8 py-4 text-text text-sm tracking-wider transition-all duration-300 font-sans cursor-pointer"
         style={{
           background: 'rgba(255,255,255,0.06)',
           backdropFilter: 'blur(12px)',
