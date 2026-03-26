@@ -32,7 +32,7 @@ export default function Landing() {
   const navigate = useNavigate()
 
   return (
-    <div className="dark-page min-h-screen flex flex-col items-center justify-center px-6 text-center relative overflow-hidden">
+    <div className="dark-page min-h-screen flex flex-col items-center px-6 pt-20 pb-16 text-center relative overflow-hidden">
 
       {/* 별 배경 */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden>
@@ -69,7 +69,7 @@ export default function Landing() {
 
       {/* 메인 카피 */}
       <div className="max-w-sm mx-auto mb-12 relative">
-        <h1 className="gold-gradient-text font-serif text-[2.6rem] leading-[1.25] mb-8">
+        <h1 className="gold-gradient-text text-[2.6rem] leading-[1.3] mb-8" style={{ fontFamily: "'SokchoBadaBatang', serif", fontWeight: 'normal' }}>
           당신이 태어나던 순간<br />
           하늘이 남긴 기록
         </h1>

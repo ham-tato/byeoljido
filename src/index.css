@@ -90,22 +90,25 @@ body {
   -webkit-backdrop-filter: blur(16px);
 }
 
-/* ── 금빛 그라데이션 타이틀 ──────────────────────────── */
+/* ── 랜딩 타이틀 — 달빛 샴페인 펄 그라데이션 ─────────
+   직관적인 금색 대신, 백금에 가까운 크림빛 광택으로
+   고급스럽고 신비로운 느낌을 줌.
+────────────────────────────────────────────────────── */
 .gold-gradient-text {
   background: linear-gradient(
-    150deg,
-    #a07820 0%,
-    #e2b93a 25%,
-    #f8e878 50%,
-    #e2b93a 75%,
-    #a07820 100%
+    160deg,
+    #c8bfa8 0%,
+    #ede6d6 30%,
+    #ffffff 50%,
+    #ede6d6 70%,
+    #c8bfa8 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   filter:
-    drop-shadow(0 0 18px rgba(220, 170, 30, 0.55))
-    drop-shadow(0 0 40px rgba(220, 170, 30, 0.25));
+    drop-shadow(0 0 24px rgba(240, 225, 190, 0.35))
+    drop-shadow(0 0 60px rgba(200, 180, 140, 0.15));
 }
 
 /* ── 다크→라이트 전환 페이드인 ───────────────────────── */
