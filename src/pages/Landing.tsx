@@ -1,86 +1,54 @@
 import { useNavigate } from 'react-router-dom'
-import charLanding from '@/assets/char-landing.png'
 
 export default function Landing() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Hero */}
-      <section className="flex-1 flex flex-col items-center justify-center px-4 text-center">
-        {/* 캐릭터 */}
-        <div className="mb-6 relative">
-          <div className="w-52 h-52 md:w-64 md:h-64 mx-auto rounded-full overflow-hidden border-2 border-accent/30 shadow-lg shadow-accent/10">
-            <img
-              src={charLanding}
-              alt="별지도 점성술사"
-              width={256}
-              height={256}
-              className="w-full h-full object-cover object-top"
-            />
-          </div>
-          {/* 말풍선 */}
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bg-card border border-border rounded-2xl px-4 py-2 shadow-lg whitespace-nowrap">
-            <p className="text-sm text-accent font-medium">당신의 별을 읽어드릴게요</p>
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-bg-card border-l border-t border-border rotate-45" />
-          </div>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative overflow-hidden">
+
+      {/* 배경 장식 */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(197,160,40,0.04) 0%, transparent 70%)' }} />
+      </div>
+
+      {/* 브랜드 */}
+      <p className="text-[11px] tracking-[0.4em] uppercase text-text-muted/60 font-display mb-16">
+        byeoljido
+      </p>
+
+      {/* 메인 카피 */}
+      <div className="max-w-sm mx-auto mb-12">
+        <h1 className="font-serif text-[2.6rem] leading-[1.25] text-text mb-8">
+          태어나던 순간,<br />
+          하늘이 남긴 기록
+        </h1>
+
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <div className="w-10 h-px bg-gold/50" />
+          <span className="text-gold/60 text-xs">✦</span>
+          <div className="w-10 h-px bg-gold/50" />
         </div>
 
-        <div className="mt-10 mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-text mb-3 leading-tight">
-            당신이 태어나던 순간,<br />하늘은 어떤 그림을<br />그리고 있었을까요?
-          </h1>
-          <p className="text-text-muted text-base md:text-lg max-w-md mx-auto leading-relaxed">
-            생년월일시와 출생지만으로<br />
-            당신만의 점성술 분석 리포트를 만들어드립니다.
-          </p>
-        </div>
+        <p className="text-text-muted text-[15px] leading-relaxed">
+          별지도는 당신이 태어난 순간의<br />
+          하늘을 읽어드립니다.
+        </p>
+      </div>
 
-        <button
-          onClick={() => navigate('/input')}
-          className="px-8 py-4 bg-primary hover:bg-primary-dark text-white text-lg font-medium rounded-xl transition-colors shadow-lg shadow-primary/20 cursor-pointer"
-        >
-          내 별지도 보기
-        </button>
+      {/* CTA */}
+      <button
+        onClick={() => navigate('/intro')}
+        className="group flex items-center gap-3 px-8 py-4 border border-text/20 hover:border-gold/60 text-text text-sm tracking-wider transition-all duration-300 font-serif cursor-pointer"
+      >
+        <span>내 별지도가 궁금하다면</span>
+        <span className="text-gold/70 transition-transform duration-300 group-hover:translate-x-1">→</span>
+      </button>
 
-        <p className="text-text-muted/60 text-xs mt-4">1,900원 &middot; 평생 열람 가능</p>
-      </section>
-
-      {/* 특징 */}
-      <section className="px-4 pb-16">
-        <div className="max-w-lg mx-auto grid gap-6">
-          <FeatureCard
-            icon="&#9734;"
-            title="정밀한 천문 데이터"
-            desc="NASA JPL 기반 Swiss Ephemeris 엔진으로 태어난 순간의 정확한 행성 배치를 계산합니다."
-          />
-          <FeatureCard
-            icon="&#128214;"
-            title="8가지 심층 분석"
-            desc="겉모습, 내면, 소통 방식, 장점, 과제, 사랑, 직업, 삶의 방향까지 총 8개 섹션의 상세한 분석을 제공합니다."
-          />
-          <FeatureCard
-            icon="&#127760;"
-            title="전세계 출생지 지원"
-            desc="한국은 물론 전세계 모든 도시의 위도·경도를 자동으로 반영합니다."
-          />
-        </div>
-      </section>
-
-      {/* 푸터 */}
-      <footer className="text-center py-6 text-text-muted/40 text-xs border-t border-border/30">
-        &copy; 2026 별지도. All rights reserved.
-      </footer>
-    </div>
-  )
-}
-
-function FeatureCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
-  return (
-    <div className="bg-bg-card rounded-xl p-5 border border-border/50">
-      <div className="text-2xl mb-2">{icon}</div>
-      <h3 className="font-bold text-text mb-1">{title}</h3>
-      <p className="text-text-muted text-sm leading-relaxed">{desc}</p>
+      {/* 하단 */}
+      <p className="absolute bottom-8 text-[10px] text-text-muted/30 tracking-widest">
+        &copy; 2026 별지도
+      </p>
     </div>
   )
 }

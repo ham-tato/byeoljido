@@ -1,198 +1,390 @@
-import { useState, useMemo } from 'react'
-import type { ChartData, Aspect } from '@/stores/chartStore'
+import { useState, useMemo, useRef } from 'react'
+import type { ChartData } from '@/stores/chartStore'
 
-const PLANET_INFO: Record<string, { label: string; color: string; size: number; summary: Record<string, string> }> = {
-  '태양': {
-    label: '태양', color: '#FCD34D', size: 22,
-    summary: { '양자리': '용기와 열정의 자아', '황소자리': '우직하고 감각적인 자아', '쌍둥이자리': '재치 넘치는 소통의 자아', '게자리': '깊은 공감의 자아', '사자자리': '당당한 리더의 자아', '처녀자리': '꼼꼼한 완벽주의 자아', '천칭자리': '조화를 추구하는 자아', '전갈자리': '강렬한 통찰의 자아', '사수자리': '자유로운 탐험가의 자아', '염소자리': '묵묵한 야심가의 자아', '물병자리': '독창적 혁신가의 자아', '물고기자리': '무한한 감수성의 자아' },
-  },
-  '달': {
-    label: '달', color: '#CBD5E1', size: 18,
-    summary: { '양자리': '불꽃처럼 뜨거운 감정', '황소자리': '안정을 갈망하는 내면', '쌍둥이자리': '쉴 새 없이 돌아가는 내면', '게자리': '누구보다 여린 감수성', '사자자리': '사랑받고 싶은 내면', '처녀자리': '감정도 분석하는 내면', '천칭자리': '조화를 갈망하는 내면', '전갈자리': '용암처럼 뜨거운 속마음', '사수자리': '자유를 갈망하는 내면', '염소자리': '무거운 책임감의 내면', '물병자리': '독립적 관찰자의 내면', '물고기자리': '경계 없는 깊은 감수성' },
-  },
-  '수성': {
-    label: '수성', color: '#67E8F9', size: 10,
-    summary: { '양자리': '직선적인 팩트 폭격기', '황소자리': '신중하고 묵직한 화법', '쌍둥이자리': '멀티태스킹 스토리텔러', '게자리': '감정으로 소통하는 공감러', '사자자리': '드라마틱한 표현력', '처녀자리': '핵심만 짚는 분석가', '천칭자리': '균형 잡힌 소통의 달인', '전갈자리': '숨은 의도를 꿰뚫는 눈', '사수자리': '큰 그림을 그리는 비전가', '염소자리': '결론부터 말하는 실용주의', '물병자리': '틀을 깨는 창의적 사고', '물고기자리': '감성적 은유의 달인' },
-  },
-  '금성': {
-    label: '금성', color: '#F9A8D4', size: 12,
-    summary: { '양자리': '거침없이 직진하는 사랑', '황소자리': '편안하고 지조 있는 사랑', '쌍둥이자리': '대화가 통해야 하는 사랑', '게자리': '헌신적으로 보살피는 사랑', '사자자리': '로맨스와 드라마의 사랑', '처녀자리': '세심한 배려로 증명하는 사랑', '천칭자리': '균형 잡힌 파트너십의 사랑', '전갈자리': '영혼까지 올인하는 사랑', '사수자리': '자유로운 모험형 사랑', '염소자리': '미래가 보이는 진지한 사랑', '물병자리': '독립성을 존중하는 사랑', '물고기자리': '경계 없이 빠져드는 사랑' },
-  },
-  '화성': {
-    label: '화성', color: '#FCA5A5', size: 11,
-    summary: { '양자리': '즉각 행동하는 추진력', '황소자리': '느리지만 멈추지 않는 힘', '쌍둥이자리': '말로 승부하는 에너지', '게자리': '소중한 것을 지키는 힘', '사자자리': '주목받을 때 타오르는 열정', '처녀자리': '완벽을 향한 집요한 힘', '천칭자리': '갈등을 조율하는 에너지', '전갈자리': '한번 물면 놓지 않는 집중력', '사수자리': '모험을 향한 거침없는 돌진', '염소자리': '단계적으로 올라가는 야망', '물병자리': '혁신을 향한 반골 에너지', '물고기자리': '직관을 따르는 부드러운 힘' },
-  },
-  '목성': {
-    label: '목성', color: '#C4B5FD', size: 14,
-    summary: { '양자리': '도전에서 행운을 만나는', '황소자리': '꾸준함이 폭발하는 행운', '쌍둥이자리': '호기심이 기회가 되는 행운', '게자리': '돌봄이 돌아오는 행운', '사자자리': '표현할 때 터지는 행운', '처녀자리': '디테일에서 기회를 찾는 행운', '천칭자리': '협업에서 시너지가 나는 행운', '전갈자리': '깊이 파고들 때 오는 행운', '사수자리': '세상을 넓힐수록 커지는 행운', '염소자리': '시간이 보상하는 행운', '물병자리': '틀을 깰 때 바뀌는 운명', '물고기자리': '직감을 따를 때 오는 행운' },
-  },
-  '토성': {
-    label: '토성', color: '#A8A29E', size: 13,
-    summary: { '양자리': '인내를 배우는 시련', '황소자리': '물질적 안정의 시련', '쌍둥이자리': '집중력의 시련', '게자리': '감정 독립의 시련', '사자자리': '겸손을 배우는 시련', '처녀자리': '완벽주의의 시련', '천칭자리': '관계의 균형 시련', '전갈자리': '통제를 내려놓는 시련', '사수자리': '현실 감각의 시련', '염소자리': '책임감과 야망의 시련', '물병자리': '자유와 규칙의 시련', '물고기자리': '경계를 세우는 시련' },
-  },
+const ZODIAC_SIGNS = [
+  { name: '양자리',    symbol: '♈\uFE0E', colorClass: 'text-red-300'    },
+  { name: '황소자리',  symbol: '♉\uFE0E', colorClass: 'text-pink-200'   },
+  { name: '쌍둥이자리',symbol: '♊\uFE0E', colorClass: 'text-sky-100'    },
+  { name: '게자리',    symbol: '♋\uFE0E', colorClass: 'text-gray-300'   },
+  { name: '사자자리',  symbol: '♌\uFE0E', colorClass: 'text-yellow-200' },
+  { name: '처녀자리',  symbol: '♍\uFE0E', colorClass: 'text-green-200'  },
+  { name: '천칭자리',  symbol: '♎\uFE0E', colorClass: 'text-pink-200'   },
+  { name: '전갈자리',  symbol: '♏\uFE0E', colorClass: 'text-rose-300'   },
+  { name: '사수자리',  symbol: '♐\uFE0E', colorClass: 'text-purple-100' },
+  { name: '염소자리',  symbol: '♑\uFE0E', colorClass: 'text-stone-400'  },
+  { name: '물병자리',  symbol: '♒\uFE0E', colorClass: 'text-cyan-200'   },
+  { name: '물고기자리',symbol: '♓\uFE0E', colorClass: 'text-indigo-200' },
+]
+
+const PLANET_SYMBOLS: Record<string, { symbol: string; colorClass: string }> = {
+  '태양':   { symbol: '☉', colorClass: 'text-amber-400'  },
+  '달':     { symbol: '☾', colorClass: 'text-gray-100'   },
+  '수성':   { symbol: '☿', colorClass: 'text-sky-300'    },
+  '금성':   { symbol: '♀', colorClass: 'text-pink-400'   },
+  '화성':   { symbol: '♂', colorClass: 'text-red-500'    },
+  '목성':   { symbol: '♃', colorClass: 'text-purple-300' },
+  '토성':   { symbol: '♄', colorClass: 'text-stone-300'  },
+  '천왕성': { symbol: '♅', colorClass: 'text-cyan-400'   },
+  '해왕성': { symbol: '♆', colorClass: 'text-indigo-400' },
+  '명왕성': { symbol: '♇', colorClass: 'text-rose-500'   },
 }
 
-function getAspectColor(type: Aspect['type']): string {
-  if (type === 'trine' || type === 'sextile') return 'rgba(212, 175, 55, 0.3)'
-  if (type === 'square' || type === 'opposition') return 'rgba(239, 68, 68, 0.25)'
-  return 'rgba(180, 180, 180, 0.2)'
+const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII']
+
+const R_INNER  = 17
+const R_MIDDLE = 28
+const R_OUTER  = 40
+const R_EDGE   = 49   // 차트 원 반지름
+const R_CENTER = 14   // 중앙 원 반지름
+const SECTOR   = 30
+
+type PlanetEntry = { symbol: string; name: string; colorClass: string }
+type HouseData = {
+  houseNum: string
+  house: string
+  sign: string
+  zodiac: string
+  sColorClass: string
+  planets: PlanetEntry[]
 }
 
-interface PlanetNode {
-  name: string
-  x: number
-  y: number
-  color: string
-  size: number
-  tooltip: string
+function buildAstrologyData(chart: ChartData): HouseData[] {
+  const ascIdx = Math.max(0, ZODIAC_SIGNS.findIndex(z => z.name === chart.ascendant.sign))
+  const planetsByHouse: Record<number, PlanetEntry[]> = {}
+  for (const [name, pos] of Object.entries(chart.planets)) {
+    const info = PLANET_SYMBOLS[name]
+    if (!info) continue
+    if (!planetsByHouse[pos.house]) planetsByHouse[pos.house] = []
+    planetsByHouse[pos.house].push({ symbol: info.symbol, name, colorClass: info.colorClass })
+  }
+  return Array.from({ length: 12 }, (_, i) => {
+    const z = ZODIAC_SIGNS[(ascIdx + i) % 12]
+    return {
+      houseNum: ROMAN[i],
+      house: `${i + 1}하우스`,
+      sign: z.name,
+      zodiac: z.symbol,
+      sColorClass: z.colorClass,
+      planets: planetsByHouse[i + 1] || [],
+    }
+  })
+}
+
+/** 파이 섹터 SVG path 생성 (cx,cy 중심, r1 내부반지름, r2 외부반지름) */
+function sectorPath(cx: number, cy: number, r1: number, r2: number, a1Deg: number, a2Deg: number): string {
+  const rad = (d: number) => (d * Math.PI) / 180
+  const a1 = rad(a1Deg), a2 = rad(a2Deg)
+  return [
+    `M ${cx + r1 * Math.cos(a1)} ${cy + r1 * Math.sin(a1)}`,
+    `A ${r1} ${r1} 0 0 1 ${cx + r1 * Math.cos(a2)} ${cy + r1 * Math.sin(a2)}`,
+    `L ${cx + r2 * Math.cos(a2)} ${cy + r2 * Math.sin(a2)}`,
+    `A ${r2} ${r2} 0 0 0 ${cx + r2 * Math.cos(a1)} ${cy + r2 * Math.sin(a1)}`,
+    'Z',
+  ].join(' ')
 }
 
 export default function NightSky({ chart }: { chart: ChartData }) {
-  const [active, setActive] = useState<string | null>(null)
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [isPressing, setIsPressing] = useState(false)
+  const interactiveSvgRef = useRef<SVGSVGElement>(null)
 
-  const SIZE = 340
-  const R = SIZE / 2 - 30
+  const astrologyData = useMemo(() => buildAstrologyData(chart), [chart])
 
-  // 행성 위치 계산
-  const planets = useMemo<PlanetNode[]>(() => {
-    const cx = SIZE / 2
-    const cy = SIZE / 2
-    const nodes: PlanetNode[] = []
+  /** 터치 좌표 → 섹터 인덱스 (범위 밖이면 null) */
+  const getSectorIdx = (clientX: number, clientY: number): number | null => {
+    const el = interactiveSvgRef.current
+    if (!el) return null
+    const rect = el.getBoundingClientRect()
+    const x = ((clientX - rect.left) / rect.width) * 100 - 50
+    const y = ((clientY - rect.top) / rect.height) * 100 - 50
+    const dist = Math.sqrt(x * x + y * y)
+    if (dist < R_CENTER || dist > R_EDGE) return null
+    let angle = Math.atan2(y, x) * (180 / Math.PI) + 90
+    if (angle < 0) angle += 360
+    return Math.floor(angle / SECTOR) % 12
+  }
 
-    for (const [name, pos] of Object.entries(chart.planets)) {
-      const info = PLANET_INFO[name]
-      if (!info) continue
-      const angle = ((270 - pos.degree) * Math.PI) / 180
-      const orbitR = R * (0.55 + (info.size / 22) * 0.25) // 큰 행성은 바깥, 작은 건 안쪽
-      nodes.push({
-        name,
-        x: cx + Math.cos(angle) * orbitR,
-        y: cy - Math.sin(angle) * orbitR,
-        color: info.color,
-        size: info.size,
-        tooltip: `${info.label} — ${pos.sign} ${pos.house}하우스: ${info.summary[pos.sign] || ''}`,
-      })
-    }
-    return nodes
-  }, [chart])
-
-  // 애스펙트 선 (주요 행성만)
-  const aspectLines = useMemo(() => {
-    const knownPlanets = new Set(Object.keys(PLANET_INFO))
-    return chart.aspects.filter(a =>
-      knownPlanets.has(a.planet1) && knownPlanets.has(a.planet2) && a.orb < 6
-    )
-  }, [chart])
-
-  const planetMap = useMemo(() => {
-    const m: Record<string, PlanetNode> = {}
-    for (const p of planets) m[p.name] = p
-    return m
-  }, [planets])
-
-  // 배경 별 (고정)
   const bgStars = useMemo(() => {
-    const stars: { x: number; y: number; r: number; o: number }[] = []
-    for (let i = 0; i < 120; i++) {
-      const rand = (n: number) => { const x = Math.sin(n * 127.1 + 42) * 43758.5453; return x - Math.floor(x) }
-      stars.push({
-        x: rand(i * 2) * SIZE,
-        y: rand(i * 2 + 1) * SIZE,
-        r: rand(i * 3) * 0.8 + 0.3,
-        o: rand(i * 5) * 0.25 + 0.05,
-      })
-    }
-    return stars
+    const rand = (n: number) => { const x = Math.sin(n * 127.1 + 42) * 43758.5453; return x - Math.floor(x) }
+    return Array.from({ length: 90 }, (_, i) => ({
+      cx: rand(i * 2) * 100,
+      cy: rand(i * 2 + 1) * 100,
+      r:  rand(i * 3) * 0.8 + 0.3,
+      opacity: rand(i * 5) * 0.25 + 0.05,
+    }))
   }, [])
 
-  const activeNode = active ? planetMap[active] : null
+  const activeItem = activeIndex !== null ? astrologyData[activeIndex] : null
+
+  const dataPointStyle = (idx: number, r: number): React.CSSProperties => {
+    const angleRad = ((idx * SECTOR) - 90) * (Math.PI / 180)
+    const isActive = activeIndex === idx
+    const isDimmed = activeIndex !== null && !isActive
+    return {
+      position: 'absolute',
+      left: `${50 + r * Math.cos(angleRad)}%`,
+      top:  `${50 + r * Math.sin(angleRad)}%`,
+      transform: isActive
+        ? 'translate(-50%,-50%) scale(1.15)'
+        : 'translate(-50%,-50%) scale(1)',
+      opacity: isDimmed ? 0.25 : 1,
+      transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+      pointerEvents: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textShadow: '0 2px 6px rgba(0,0,0,0.95)',
+      zIndex: 30,
+    }
+  }
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative" style={{ width: SIZE, height: SIZE }}>
-        {/* SVG 밤하늘 */}
-        <svg width={SIZE} height={SIZE} className="absolute inset-0">
-          <defs>
-            <radialGradient id="skyBg">
-              <stop offset="0%" stopColor="#171735" />
-              <stop offset="60%" stopColor="#0e0e28" />
-              <stop offset="100%" stopColor="#070712" />
-            </radialGradient>
-            <clipPath id="skyClip">
-              <circle cx={SIZE / 2} cy={SIZE / 2} r={SIZE / 2 - 2} />
-            </clipPath>
-          </defs>
+    <>
+    <div className="relative w-full" style={{ aspectRatio: '1 / 1' }}>
 
-          {/* 배경 원 */}
-          <circle cx={SIZE / 2} cy={SIZE / 2} r={SIZE / 2 - 2} fill="url(#skyBg)" stroke="rgba(197,160,40,0.15)" strokeWidth={1} />
+      {/* ── 배경 SVG (별, 링, 구분선) ── */}
+      <svg
+        viewBox="0 0 100 100"
+        className="absolute inset-0 w-full h-full"
+        style={{ zIndex: 10, pointerEvents: 'none' }}
+      >
+        <defs>
+          <radialGradient id="nc-bg">
+            <stop offset="0%"   stopColor="#171735" />
+            <stop offset="60%"  stopColor="#0e0e28" />
+            <stop offset="100%" stopColor="#020205" />
+          </radialGradient>
+          <clipPath id="nc-clip">
+            <circle cx="50" cy="50" r={R_EDGE} />
+          </clipPath>
+        </defs>
 
-          <g clipPath="url(#skyClip)">
-            {/* 배경 별 */}
-            {bgStars.map((s, i) => (
-              <circle key={i} cx={s.x} cy={s.y} r={s.r} fill={`rgba(255,255,255,${s.o})`} />
-            ))}
+        <circle cx="50" cy="50" r={R_EDGE} fill="url(#nc-bg)" stroke="rgba(197,160,40,0.25)" strokeWidth="0.4" />
 
-            {/* 애스펙트 연결선 */}
-            {aspectLines.map((a, i) => {
-              const p1 = planetMap[a.planet1]
-              const p2 = planetMap[a.planet2]
-              if (!p1 || !p2) return null
-              const isHighlighted = active === a.planet1 || active === a.planet2
-              return (
-                <line
-                  key={i}
-                  x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
-                  stroke={getAspectColor(a.type)}
-                  strokeWidth={isHighlighted ? 1.5 : 0.8}
-                  strokeDasharray={a.type === 'square' || a.type === 'opposition' ? '4,4' : '6,3'}
-                  opacity={active ? (isHighlighted ? 1 : 0.2) : 0.6}
-                  className="transition-opacity duration-200"
-                />
-              )
-            })}
+        <g clipPath="url(#nc-clip)">
+          {bgStars.map((s, i) => (
+            <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={`rgba(255,255,255,${s.opacity})`} />
+          ))}
+        </g>
 
-            {/* 행성들 */}
-            {planets.map(p => {
-              const isActive = active === p.name
-              const dimmed = active && !isActive
-              return (
-                <g
-                  key={p.name}
-                  className="cursor-pointer transition-opacity duration-200"
-                  opacity={dimmed ? 0.3 : 1}
-                  onClick={() => setActive(isActive ? null : p.name)}
-                >
-                  {/* 글로우 */}
-                  <circle cx={p.x} cy={p.y} r={p.size * 1.8} fill={p.color} opacity={isActive ? 0.2 : 0.08} />
-                  {/* 본체 */}
-                  <circle cx={p.x} cy={p.y} r={p.size / 2.5} fill={p.color} opacity={0.9} />
-                  {/* 라벨 */}
-                  <text
-                    x={p.x} y={p.y + p.size / 2.5 + 12}
-                    textAnchor="middle"
-                    fill="rgba(255,255,255,0.6)"
-                    fontSize="10"
-                    fontFamily="Pretendard, sans-serif"
-                  >
-                    {p.name}
-                  </text>
-                </g>
-              )
-            })}
-          </g>
-        </svg>
+        {/* 링 */}
+        <circle cx="50" cy="50" r={R_CENTER}      fill="none" stroke="#D4AF37" strokeWidth="0.06" opacity="0.5" />
+        <circle cx="50" cy="50" r={R_INNER}        fill="none" stroke="#D4AF37" strokeWidth="0.08" strokeDasharray="0.2 0.6" opacity="0.5" className="nc-spin-reverse" />
+        <circle cx="50" cy="50" r={R_MIDDLE}       fill="none" stroke="#D4AF37" strokeWidth="0.1"  strokeDasharray="0.3 0.8" opacity="0.6" className="nc-spin" />
+        <circle cx="50" cy="50" r={R_MIDDLE + 0.5} fill="none" stroke="#D4AF37" strokeWidth="0.04" opacity="0.3" />
+        <circle cx="50" cy="50" r={R_OUTER}        fill="none" stroke="#D4AF37" strokeWidth="0.15" opacity="0.5" />
+        <circle cx="50" cy="50" r={R_OUTER + 2}    fill="none" stroke="#FDE68A" strokeWidth="0.06" strokeDasharray="0.2 1" opacity="0.7" className="nc-spin-reverse" />
+
+        {/* 구분선 */}
+        {astrologyData.map((_, idx) => {
+          const divAngle = (idx * SECTOR) - 90 - SECTOR / 2
+          const isNearActive = activeIndex !== null && (activeIndex === idx || activeIndex === (idx - 1 + 12) % 12)
+          return (
+            <g key={idx} transform={`translate(50,50) rotate(${divAngle})`}>
+              <line
+                x1={R_CENTER} y1="0" x2={R_EDGE} y2="0"
+                stroke="#D4AF37"
+                strokeWidth={isNearActive ? '0.25' : '0.12'}
+                opacity={isNearActive ? 0.9 : 0.55}
+                style={{ transition: 'all 0.3s ease' }}
+              />
+              <polygon points="20,-0.4 20.5,0 20,0.4 19.5,0"     fill="#D4AF37" opacity="0.8" />
+              <polygon points="25.5,-0.5 26.2,0 25.5,0.5 24.8,0" fill="#D4AF37" opacity="0.9" />
+              <circle cx="33" cy="0" r="0.3" fill="#FDE68A" opacity="0.8" />
+              <polygon points="44,-0.5 45,0 44,0.5 43,0"         fill="#FDE68A" opacity="0.9" />
+            </g>
+          )
+        })}
+      </svg>
+
+      {/* ── 인터랙티브 섹터 SVG (hover 영역 + 하이라이트) ── */}
+      <svg
+        ref={interactiveSvgRef}
+        viewBox="0 0 100 100"
+        className="absolute inset-0 w-full h-full"
+        style={{ zIndex: 20, touchAction: 'none' }}
+        onPointerDown={(e) => {
+          if (e.pointerType === 'mouse') return
+          e.preventDefault()
+          const idx = getSectorIdx(e.clientX, e.clientY)
+          if (idx === null) { setActiveIndex(null); return }
+          // 같은 섹터 재탭 → 닫기
+          if (!isPressing && activeIndex === idx) { setActiveIndex(null); return }
+          setActiveIndex(idx)
+          setIsPressing(true)
+          e.currentTarget.setPointerCapture(e.pointerId)
+        }}
+        onPointerMove={(e) => {
+          if (e.pointerType === 'mouse' || !isPressing) return
+          const idx = getSectorIdx(e.clientX, e.clientY)
+          if (idx !== null && idx !== activeIndex) setActiveIndex(idx)
+        }}
+        onPointerUp={(e) => {
+          if (e.pointerType === 'mouse') return
+          setIsPressing(false)
+          // activeIndex 유지 (닫지 않음)
+        }}
+        onPointerCancel={() => setIsPressing(false)}
+      >
+        <clipPath id="nc-sector-clip">
+          <circle cx="50" cy="50" r={R_EDGE} />
+        </clipPath>
+        <g clipPath="url(#nc-sector-clip)">
+          {astrologyData.map((_, idx) => {
+            const startAngle = (idx * SECTOR) - 90 - SECTOR / 2
+            const endAngle   = startAngle + SECTOR
+            const isActive   = activeIndex === idx
+            const isDimmed   = activeIndex !== null && !isActive
+            return (
+              <path
+                key={idx}
+                d={sectorPath(50, 50, R_CENTER, R_EDGE, startAngle, endAngle)}
+                fill={
+                  isActive  ? 'rgba(212,175,55,0.10)' :
+                  isDimmed  ? 'rgba(0,0,0,0.40)'       :
+                  'transparent'
+                }
+                stroke={isActive ? 'rgba(212,175,55,0.55)' : 'none'}
+                strokeWidth="0.3"
+                style={{ cursor: 'pointer', transition: 'fill 0.3s ease, stroke 0.3s ease' }}
+                onPointerEnter={(e) => { if (e.pointerType === 'mouse') setActiveIndex(idx) }}
+                onPointerLeave={(e) => { if (e.pointerType === 'mouse') setActiveIndex(null) }}
+              />
+            )
+          })}
+        </g>
+      </svg>
+
+      {/* ── 데이터 포인트 HTML 레이어 ── */}
+      <div className="absolute inset-0 w-full h-full" style={{ zIndex: 30, pointerEvents: 'none' }}>
+        {astrologyData.map((item, idx) => (
+          <div key={idx}>
+            {/* 하우스 번호 */}
+            <div style={{ ...dataPointStyle(idx, R_INNER), fontSize: '0.65rem' }}
+              className={activeIndex === null ? 'nc-breathe' : ''}>
+              <span style={{ color: '#EAB308', fontFamily: 'serif' }}>{item.houseNum}</span>
+            </div>
+
+            {/* 행성 */}
+            <div style={{ ...dataPointStyle(idx, R_MIDDLE), fontSize: '1.05rem' }}
+              className={activeIndex === null ? 'nc-breathe' : ''}>
+              {item.planets.length === 0 ? (
+                <span style={{ color: '#9CA3AF', opacity: 0.3 }}>⚬</span>
+              ) : (
+                <div style={{ display: 'flex', gap: '2px' }}>
+                  {item.planets.map(p => (
+                    <span key={p.name} className={p.colorClass}>{p.symbol}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 황도 기호 */}
+            <div style={{ ...dataPointStyle(idx, R_OUTER), fontSize: '0.9rem' }}
+              className={activeIndex === null ? 'nc-breathe' : ''}>
+              <span className={item.sColorClass}>{item.zodiac}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* 툴팁 */}
-      <div className="h-12 flex items-center justify-center mt-3">
-        {activeNode ? (
-          <p className="text-sm text-text-muted text-center px-4 animate-[fadeIn_0.2s]">
-            {activeNode.tooltip}
-          </p>
+      {/* ── 중앙 디스플레이 ── */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full backdrop-blur-md flex flex-col items-center justify-center text-center"
+        style={{
+          width: '30%',
+          height: '30%',
+          zIndex: 40,
+          background: activeItem ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.6)',
+          border: `1px solid ${activeItem ? 'rgba(212,175,55,0.7)' : 'rgba(212,175,55,0.3)'}`,
+          boxShadow: activeItem
+            ? '0 0 20px rgba(212,175,55,0.25), inset 0 0 15px rgba(0,0,0,0.5)'
+            : '0 0 20px rgba(212,175,55,0.1)',
+          transition: 'all 0.3s ease',
+          padding: '2%',
+          pointerEvents: activeItem ? 'auto' : 'none',
+          overflow: 'hidden',
+          cursor: activeItem ? 'pointer' : 'default',
+        }}
+        onClick={() => { if (activeItem) { setActiveIndex(null); setIsPressing(false) } }}
+      >
+        {activeItem ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', width: '100%', minHeight: 0, overflow: 'hidden' }}>
+            {/* 하우스명 */}
+            <span style={{
+              color: '#9CA3AF',
+              fontSize: 'clamp(11px, 3.2vw, 13px)',
+              borderBottom: '1px solid rgba(75,85,99,0.5)',
+              paddingBottom: '3px',
+              width: '85%',
+              textAlign: 'center',
+            }}>
+              {activeItem.house}
+            </span>
+
+            {/* 행성 */}
+            {activeItem.planets.length === 0 ? (
+              <span style={{ color: '#6B7280', fontSize: 'clamp(11px, 3vw, 13px)' }}>행성 없음</span>
+            ) : activeItem.planets.length === 1 ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span className={activeItem.planets[0].colorClass} style={{ fontSize: 'clamp(17px, 4.8vw, 22px)' }}>
+                  {activeItem.planets[0].symbol}
+                </span>
+                <span style={{ color: '#fff', fontWeight: 700, fontSize: 'clamp(11px, 3vw, 13px)' }}>
+                  {activeItem.planets[0].name}
+                </span>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', gap: '2px', fontSize: `clamp(${13 - activeItem.planets.length}px, ${3.5 - activeItem.planets.length * 0.3}vw, ${18 - activeItem.planets.length}px)` }}>
+                  {activeItem.planets.map(p => (
+                    <span key={p.name} className={p.colorClass}>{p.symbol}</span>
+                  ))}
+                </div>
+                <div style={{ color: '#e5e7eb', fontWeight: 600, fontSize: 'clamp(9px, 2.4vw, 11px)', lineHeight: 1.2, textAlign: 'center' }}>
+                  {activeItem.planets.map(p => p.name).join(' · ')}
+                </div>
+              </>
+            )}
+
+            {/* 사인 */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '4px',
+              borderTop: '1px solid rgba(75,85,99,0.3)',
+              paddingTop: '3px',
+              width: '85%',
+              justifyContent: 'center',
+            }}>
+              <span className={activeItem.sColorClass} style={{ fontSize: 'clamp(11px, 3vw, 13px)' }}>
+                {activeItem.sign}
+              </span>
+              <span className={activeItem.sColorClass} style={{ fontSize: 'clamp(13px, 3.5vw, 16px)' }}>
+                {activeItem.zodiac}
+              </span>
+            </div>
+
+            {/* 닫기 유도 */}
+            <span style={{
+              color: 'rgba(156,163,175,0.5)',
+              fontSize: 'clamp(8px, 2vw, 10px)',
+              letterSpacing: '0.05em',
+              marginTop: '2px',
+            }}>
+              눌러서 닫기
+            </span>
+          </div>
         ) : (
-          <p className="text-xs text-text-muted/50 italic">별을 탭해서 자세히 보기</p>
+          <span style={{ color: '#EAB308', fontSize: 'clamp(14px, 3vw, 20px)', textShadow: '0 0 15px rgba(212,175,55,0.8)' }}>
+            ✦
+          </span>
         )}
       </div>
+
     </div>
+
+    <p className="text-center text-xs text-text-muted/50 tracking-widest mt-4">
+      터치 후 드래그하거나 영역을 눌러보세요
+    </p>
+    </>
   )
 }

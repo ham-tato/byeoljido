@@ -43,26 +43,52 @@ function getElementMetaphor(sign: string) {
   return SIGN_ELEMENT[sign] || { element: '?', metaphor: sign, keyword: sign }
 }
 
+// 별자리별 외면/내면 페르소나 (한 줄 요약용)
+const SIGN_PERSONA: Record<string, { outer: string; inner: string }> = {
+  '양자리':    { outer: '선두주자',    inner: '충동적 개척자'  },
+  '황소자리':  { outer: '안정형 현실주의자', inner: '소유욕 강한 감각주의자' },
+  '쌍둥이자리':{ outer: '멀티플레이어', inner: '정보 수집형 변신가' },
+  '게자리':    { outer: '공감형 보호자', inner: '감수성 심한 집착가' },
+  '사자자리':  { outer: '주인공 아우라', inner: '인정 욕구 강한 카리스마' },
+  '처녀자리':  { outer: '분석형 완벽주의자', inner: '불안 기반 통제자' },
+  '천칭자리':  { outer: '외교관',       inner: '갈등 회피형 균형주의자' },
+  '전갈자리':  { outer: '심해형 전략가', inner: '집착과 통찰의 소유자' },
+  '사수자리':  { outer: '자유인',       inner: '회피형 모험가'  },
+  '염소자리':  { outer: '야망형 전략가', inner: '통제 욕구 강한 현실주의자' },
+  '물병자리':  { outer: '아웃사이더 혁신가', inner: '감정 차단형 관찰자' },
+  '물고기자리':{ outer: '몽상가',       inner: '경계 없는 공감자' },
+}
+
 function generateChartSummary(chart: ChartData, nickname: string): { title: string; body: string } {
-  const sunSign = chart.planets['태양']?.sign || '양자리'
-  const moonSign = chart.planets['달']?.sign || '양자리'
-  const ascSign = chart.ascendant.sign
+  const sunSign  = chart.planets['태양']?.sign || '양자리'
+  const moonSign = chart.planets['달']?.sign   || '양자리'
+  const ascSign  = chart.ascendant.sign
 
-  const sun = getElementMetaphor(sunSign)
+  const sun  = getElementMetaphor(sunSign)
   const moon = getElementMetaphor(moonSign)
-  const asc = getElementMetaphor(ascSign)
+  const asc  = getElementMetaphor(ascSign)
 
-  // 제목: 짧고 직관적으로
-  const title = `${sun.shortLabel} 같은 자아, ${asc.shortLabel} 같은 겉모습, ${moon.shortLabel} 같은 내면`
+  const ascPersona  = SIGN_PERSONA[ascSign]?.outer  || ascSign
+  const sunPersona  = SIGN_PERSONA[sunSign]?.inner  || sunSign
+  const moonPersona = SIGN_PERSONA[moonSign]?.inner || moonSign
 
-  const body = `${nickname}님이 태어난 날, 하늘의 별들은 아주 특별한 그림을 그리고 있었어요. ` +
-    `가장 중요한 자아를 뜻하는 태양은 ${sun.metaphor}의 기운을 가진 ${sunSign}에 머물렀어요. ` +
-    `이 배치 덕분에 ${nickname}님은 ${sun.keyword}${eulReul(sun.keyword)} 타고났죠. ` +
-    `동시에 첫인상을 결정하는 동쪽 지평선에는 ${asc.metaphor} 같은 ${ascSign}${iGa(ascSign)} 자리하고 있었어요.\n\n` +
-    `여기에 깊은 내면을 상징하는 달은 ${moon.metaphor}의 기운을 가진 ${moonSign}에 머물고 있었네요. ` +
-    `정리하면, ${nickname}님은 겉으로는 ${asc.keyword}${eulReul(asc.keyword)} 보여주면서, ` +
-    `중심에는 ${sun.keyword}${iGa(sun.keyword)} 단단하게 자리 잡고, ` +
-    `내면 깊은 곳에서는 ${moon.keyword}${iGa(moon.keyword)} 조용히 흐르는 사람이에요.`
+  // 한 줄 요약: 상승(겉) vs 태양/달(속) 대비
+  let title: string
+  if (ascSign === sunSign) {
+    title = `겉도 속도 ${ascPersona}, 내면 깊이는 ${moonPersona}`
+  } else {
+    title = `${ascPersona}의 가면, 본질은 ${sunPersona}`
+  }
+
+  const body =
+    `${nickname}님이 태어난 날, 하늘의 별들은 아주 특별한 그림을 그리고 있었어요. ` +
+    `가장 중요한 자아를 뜻하는 **태양**은 ${sun.metaphor}의 기운을 가진 **${sunSign}**에 머물렀어요. ` +
+    `이 배치 덕분에 ${nickname}님은 **${sun.keyword}**${eulReul(sun.keyword)} 타고났죠. ` +
+    `동시에 첫인상을 결정하는 동쪽 지평선에는 ${asc.metaphor} 같은 **${ascSign}**${iGa(ascSign)} 자리하고 있었어요.\n\n` +
+    `여기에 깊은 내면을 상징하는 **달**은 ${moon.metaphor}의 기운을 가진 **${moonSign}**에 머물고 있었네요. ` +
+    `정리하면, ${nickname}님은 겉으로는 **${asc.keyword}**${eulReul(asc.keyword)} 보여주면서, ` +
+    `중심에는 **${sun.keyword}**${iGa(sun.keyword)} 단단하게 자리 잡고, ` +
+    `내면 깊은 곳에서는 **${moon.keyword}**${iGa(moon.keyword)} 조용히 흐르는 사람이에요.`
 
   return { title, body }
 }

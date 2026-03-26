@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 
 const Landing = lazy(() => import('@/pages/Landing'))
+const Intro = lazy(() => import('@/pages/Intro'))
 const InputForm = lazy(() => import('@/pages/InputForm'))
 const Result = lazy(() => import('@/pages/Result'))
 
@@ -18,6 +19,7 @@ export default function App() {
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/intro" element={<Intro />} />
         <Route path="/input" element={<InputForm />} />
         <Route path="/result" element={<Result />} />
       </Routes>
