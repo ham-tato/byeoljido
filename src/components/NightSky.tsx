@@ -85,7 +85,7 @@ function sectorPath(cx: number, cy: number, r1: number, r2: number, a1Deg: numbe
 
 export default function NightSky({ chart }: { chart: ChartData }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const [isPressing, setIsPressing] = useState(false)
+
   const interactiveSvgRef = useRef<SVGSVGElement>(null)
 
   const astrologyData = useMemo(() => buildAstrologyData(chart), [chart])
@@ -202,29 +202,14 @@ export default function NightSky({ chart }: { chart: ChartData }) {
         ref={interactiveSvgRef}
         viewBox="0 0 100 100"
         className="absolute inset-0 w-full h-full"
-        style={{ zIndex: 20, touchAction: 'none' }}
-        onPointerDown={(e) => {
+        style={{ zIndex: 20, touchAction: 'auto' }}
+        onClick={(e) => {
           if (e.pointerType === 'mouse') return
-          e.preventDefault()
           const idx = getSectorIdx(e.clientX, e.clientY)
           if (idx === null) { setActiveIndex(null); return }
-          // 같은 섹터 재탭 → 닫기
-          if (!isPressing && activeIndex === idx) { setActiveIndex(null); return }
+          if (activeIndex === idx) { setActiveIndex(null); return }
           setActiveIndex(idx)
-          setIsPressing(true)
-          e.currentTarget.setPointerCapture(e.pointerId)
         }}
-        onPointerMove={(e) => {
-          if (e.pointerType === 'mouse' || !isPressing) return
-          const idx = getSectorIdx(e.clientX, e.clientY)
-          if (idx !== null && idx !== activeIndex) setActiveIndex(idx)
-        }}
-        onPointerUp={(e) => {
-          if (e.pointerType === 'mouse') return
-          setIsPressing(false)
-          // activeIndex 유지 (닫지 않음)
-        }}
-        onPointerCancel={() => setIsPressing(false)}
       >
         <clipPath id="nc-sector-clip">
           <circle cx="50" cy="50" r={R_EDGE} />
@@ -306,7 +291,7 @@ export default function NightSky({ chart }: { chart: ChartData }) {
           overflow: 'hidden',
           cursor: activeItem ? 'pointer' : 'default',
         }}
-        onClick={() => { if (activeItem) { setActiveIndex(null); setIsPressing(false) } }}
+        onClick={() => { if (activeItem) setActiveIndex(null) }}
       >
         {activeItem ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px', width: '100%', minHeight: 0, overflow: 'hidden' }}>
