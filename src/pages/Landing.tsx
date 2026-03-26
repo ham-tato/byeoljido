@@ -105,7 +105,7 @@ export default function Landing() {
           ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,40,0.3)'
         }}
       >
-        <span>내 별지도가 궁금하다면</span>
+        <span>내 별지도 펼쳐보기</span>
         <span className="text-gold/70 transition-transform duration-300 group-hover:translate-x-1">→</span>
       </button>
 
