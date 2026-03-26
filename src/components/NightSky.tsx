@@ -31,7 +31,7 @@ const PLANET_SYMBOLS: Record<string, { symbol: string; colorClass: string }> = {
 
 const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII']
 
-const R_INNER  = 17
+const R_INNER  = 19
 const R_MIDDLE = 28
 const R_OUTER  = 40
 const R_EDGE   = 49   // 차트 원 반지름
