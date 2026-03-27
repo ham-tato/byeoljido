@@ -140,9 +140,9 @@ export default function Landing() {
         </div>
 
         <p className="text-text-muted text-[15px] leading-relaxed">
-          숨겨진 매력, 사랑의 방식, 일의 재능,<br />
-          그리고 지금 이 시기에 무엇을 해야 하는지.<br />
-          별이 이미 알고 있습니다.
+          사랑, 재능, 직업, 그리고 지금 당장 해야 할 일까지<br />
+          당신의 별지도가 말해주는 모든 것<br />
+          <span className="text-gold/60">단돈 1,900원.</span>
         </p>
       </div>
 

@@ -8,7 +8,6 @@ import { HOUSE_CONTEXT } from '@/data/templates/houses'
 import { JUPITER_IN_SIGN } from '@/data/templates/jupiter'
 import { DESCENDANT_MAP, DESTINED_PARTNER } from '@/data/templates/descendant'
 import { APPEARANCE_SUBTITLE, INNER_SUBTITLE, COMMUNICATION_SUBTITLE, LOVE_SUBTITLE, CAREER_SUBTITLE, LIFE_DIRECTION_SUBTITLE, JUPITER_SUBTITLE, DESTINED_PARTNER_SUBTITLE } from '@/data/templates/subtitles'
-import { LOVE_ACTION, CAREER_ACTION, LIFE_DIRECTION_ACTION, TALENT_ACTION, STRENGTHS_ACTION, CHALLENGES_ACTION } from '@/data/templates/actions'
 import { eulReul, iGa, gwaWa } from '@/lib/particles'
 
 const PLANET_SYMBOLS: Record<string, string> = {
@@ -30,7 +29,6 @@ export interface ReadingSection {
   badges?: StarBadge[]
   starMovement: string
   body: string
-  action?: string
 }
 
 export interface Reading {
@@ -193,7 +191,6 @@ function generateStrengths(chart: ChartData): ReadingSection {
         ],
         starMovement: `${aspect.planet1}${gwaWa(aspect.planet1)} ${aspect.planet2}${iGa(aspect.planet2)} 서로를 밀어주는 아주 긍정적인 각도(${typeName})를 맺고 있습니다.`,
         body: template.body,
-        action: STRENGTHS_ACTION[key],
       }
     }
   }
@@ -234,7 +231,6 @@ function generateChallenges(chart: ChartData): ReadingSection {
         ],
         starMovement: `${aspect.planet1}${gwaWa(aspect.planet1)} ${aspect.planet2}${iGa(aspect.planet2)} 팽팽하게 대립하는 긴장의 각도(${typeName})를 맺고 있습니다.`,
         body: template.body,
-        action: CHALLENGES_ACTION[key],
       }
     }
   }
@@ -246,7 +242,6 @@ function generateChallenges(chart: ChartData): ReadingSection {
     subtitle: fallback.title,
     starMovement: '토성의 무거운 에너지가 당신의 자아에 시련과 통제의 기운을 더하고 있습니다.',
     body: fallback.body,
-    action: CHALLENGES_ACTION['태양-토성'],
   }
 }
 
@@ -264,7 +259,6 @@ function generateLove(chart: ChartData): ReadingSection {
     badges: [{ symbol: '♀', label: '금성', sign: venus.sign, house: venus.house }],
     starMovement: `연애와 관계를 주관하는 금성이 ${venus.sign}에, 그리고 ${house?.area || `${venus.house}하우스`}인 ${venus.house}하우스에 머물고 있습니다.`,
     body: text,
-    action: LOVE_ACTION[venus.sign],
   }
 }
 
@@ -292,7 +286,6 @@ function generateCareer(chart: ChartData): ReadingSection {
     badges: [{ symbol: 'MC', label: '중천', sign: mcSign }],
     starMovement: `커리어의 최고점(MC)이 ${mcSign}에 자리 잡고 있습니다.`,
     body: text + extraText,
-    action: CAREER_ACTION[mcSign],
   }
 }
 
@@ -308,7 +301,6 @@ function generateLifeDirection(chart: ChartData): ReadingSection {
     badges: [{ symbol: '☊', label: '북교점', sign: nn.sign, house: nn.house }],
     starMovement: `이번 생에서 반드시 나아가야 할 진화의 방향을 뜻하는 북교점이 ${nn.sign}에, 그리고 ${house?.area || `${nn.house}하우스`}인 ${nn.house}하우스에 위치하고 있습니다.`,
     body: text,
-    action: LIFE_DIRECTION_ACTION[nn.sign],
   }
 }
 
@@ -326,7 +318,6 @@ function generateHiddenTalent(chart: ChartData): ReadingSection {
     badges: [{ symbol: '♃', label: '목성', sign: jupiter.sign, house: jupiter.house }],
     starMovement: `확장과 행운의 별 목성이 ${jupiter.sign}에, 그리고 ${house?.area || `${jupiter.house}하우스`}인 ${jupiter.house}하우스에 자리 잡고 있습니다.`,
     body: text,
-    action: TALENT_ACTION[jupiter.sign],
   }
 }
 
