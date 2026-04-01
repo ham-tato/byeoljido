@@ -13,7 +13,7 @@ export async function kakaoLogin(): Promise<void> {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'kakao',
     options: {
-      redirectTo: window.location.origin,
+      redirectTo: `${window.location.origin}/input`,
       scopes: '',
     },
   })
