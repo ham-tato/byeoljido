@@ -101,7 +101,7 @@ export default function CitySearch({ value, onChange }: Props) {
 
       {/* 검색 결과 드롭다운 */}
       {isOpen && (results.length > 0 || isSearching) && (
-        <div className="absolute z-50 w-full mt-1 bg-bg-card border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto" style={{ background: '#1a1a2e' }}>
           {results.map((city, i) => (
             <button
               key={`${city.name}-${city.lat}-${i}`}
