@@ -5,6 +5,7 @@ const Landing = lazy(() => import('@/pages/Landing'))
 const Intro = lazy(() => import('@/pages/Intro'))
 const InputForm = lazy(() => import('@/pages/InputForm'))
 const Result = lazy(() => import('@/pages/Result'))
+const Terms = lazy(() => import('@/pages/Terms'))
 
 function Loading() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/intro" element={<Intro />} />
         <Route path="/input" element={<InputForm />} />
         <Route path="/result" element={<Result />} />
+        <Route path="/terms" element={<Terms />} />
       </Routes>
     </Suspense>
   )

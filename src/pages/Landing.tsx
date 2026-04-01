@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { initKakao, kakaoLogin, kakaoLogout } from '@/lib/kakao'
 import { useAuthStore } from '@/stores/authStore'
 import { useChartStore } from '@/stores/chartStore'
@@ -301,9 +301,14 @@ export default function Landing() {
       </div>
 
       {/* 하단 */}
-      <p className="text-[10px] text-text-muted/30 tracking-widest mb-10 relative">
-        &copy; 2026 별지도
-      </p>
+      <div className="flex flex-col items-center gap-2 mb-10 relative">
+        <Link to="/terms" className="text-[11px] text-text-muted/40 hover:text-text-muted/70 transition-colors">
+          이용약관
+        </Link>
+        <p className="text-[10px] text-text-muted/30 tracking-widest">
+          &copy; 2026 별지도
+        </p>
+      </div>
     </div>
   )
 }
