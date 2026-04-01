@@ -302,9 +302,15 @@ export default function Landing() {
 
       {/* 하단 */}
       <div className="flex flex-col items-center gap-2 mb-10 relative">
-        <Link to="/terms" className="text-[11px] text-text-muted/40 hover:text-text-muted/70 transition-colors">
-          이용약관
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/terms" className="text-[11px] text-text-muted/40 hover:text-text-muted/70 transition-colors">
+            이용약관
+          </Link>
+          <span className="text-text-muted/20 text-[11px]">|</span>
+          <Link to="/privacy" className="text-[11px] text-text-muted/40 hover:text-text-muted/70 transition-colors">
+            개인정보처리방침
+          </Link>
+        </div>
         <p className="text-[10px] text-text-muted/30 tracking-widest">
           &copy; 2026 별지도
         </p>
