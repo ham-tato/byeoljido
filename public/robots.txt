@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /result
 
-Sitemap: https://byeoljido-git.pages.dev/sitemap.xml
+Sitemap: https://byeoljido.kr/sitemap.xml
