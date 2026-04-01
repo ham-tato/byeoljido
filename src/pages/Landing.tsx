@@ -188,6 +188,13 @@ export default function Landing() {
               </svg>
               {loggingIn ? '로그인 중...' : '카카오톡으로 로그인하기'}
             </button>
+            {/* 로그인 없이 시작 */}
+            <button
+              onClick={() => navigate('/input')}
+              className="text-[12px] text-text-muted/50 hover:text-text-muted/80 transition-colors cursor-pointer font-sans mt-2"
+            >
+              로그인 없이 시작하기
+            </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-3">
