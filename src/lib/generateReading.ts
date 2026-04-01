@@ -29,6 +29,7 @@ export interface ReadingSection {
   badges?: StarBadge[]
   starMovement: string
   body: string
+  action?: string
 }
 
 export interface Reading {
