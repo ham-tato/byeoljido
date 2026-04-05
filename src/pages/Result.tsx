@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useChartStore } from '@/stores/chartStore'
-import { useAuthStore } from '@/stores/authStore'
 import { generateReading } from '@/lib/generateReading'
 import { calculateChart } from '@/lib/astro'
 import type { ReadingSection, StarBadge } from '@/lib/generateReading'
@@ -138,7 +137,6 @@ export default function Result() {
   const storeInput = useChartStore(s => s.input)
   const storeChart = useChartStore(s => s.chart)
   const [copied, setCopied] = useState(false)
-  const { user, saveResult } = useAuthStore()
 
   async function handleShare(input: BirthInput) {
     const url = generateShareUrl(input)
@@ -158,11 +156,6 @@ export default function Result() {
   useEffect(() => {
     if (!data) navigate('/input')
   }, [data, navigate])
-
-  // 로그인 상태면 결과 자동 저장 (Supabase)
-  useEffect(() => {
-    if (data && user) { saveResult(data.input, data.chart) }
-  }, [data?.input, user?.id]) // eslint-disable-line
 
   if (!data) return <div className="min-h-screen flex items-center justify-center text-text-muted font-serif italic">별을 읽고 있습니다...</div>
   const { input, chart } = data
