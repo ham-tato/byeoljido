@@ -1,0 +1,10 @@
+name = "byeoljido-git"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "dist"
+
+[vars]
+SUPABASE_URL = "https://uikchwmbortfpncjnipk.supabase.co"
+
+# secrets (wrangler secret put으로 설정):
+# SUPABASE_SERVICE_KEY
+# PORTONE_API_SECRET
