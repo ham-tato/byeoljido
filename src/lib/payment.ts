@@ -1,12 +1,27 @@
+import * as PortOne from '@portone/browser-sdk/v2'
 import type { PayMethod } from '@/components/PaywallOverlay'
 
-/**
- * 결제 요청 — Task 5에서 실제 구현 예정
- * 현재는 placeholder로 빌드 통과용
- */
-export async function requestPayment(
-  _code: string,
-  _method: PayMethod,
-): Promise<string | null> {
-  throw new Error('결제 모듈이 아직 구현되지 않았습니다.')
+const STORE_ID = import.meta.env.VITE_PORTONE_STORE_ID || ''
+const CHANNEL_KEY_KAKAOPAY = import.meta.env.VITE_PORTONE_CHANNEL_KAKAOPAY || ''
+const CHANNEL_KEY_TOSSPAY = import.meta.env.VITE_PORTONE_CHANNEL_TOSSPAY || ''
+
+export async function requestPayment(code: string, method: PayMethod): Promise<string | null> {
+  const paymentId = `byeoljido-${code}-${Date.now()}`
+  const channelKey = method === 'kakaopay' ? CHANNEL_KEY_KAKAOPAY : CHANNEL_KEY_TOSSPAY
+
+  const response = await PortOne.requestPayment({
+    storeId: STORE_ID,
+    channelKey,
+    paymentId,
+    orderName: '별지도 전체 리포트',
+    totalAmount: 1900,
+    currency: 'CURRENCY_KRW',
+    payMethod: 'EASY_PAY',
+  })
+
+  if (!response || response.code) {
+    return null
+  }
+
+  return response.paymentId
 }
