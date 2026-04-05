@@ -5,13 +5,13 @@ export default function Privacy() {
       <p className="text-sm text-text-muted mb-12">시행일: 2026년 4월 1일</p>
 
       <p className="text-sm text-text-muted leading-relaxed mb-10">
-        숨숨(이하 "회사")은(는) 이용자의 개인정보를 중요하게 보호하며, 관련 법령에 따라 다음과 같이 개인정보를 처리합니다.
+        하우워즈(이하 "회사")은(는) 이용자의 개인정보를 중요하게 보호하며, 관련 법령에 따라 다음과 같이 개인정보를 처리합니다.
       </p>
 
       <Section title="1. 개인정보의 처리 목적">
         <p>회사는 다음의 목적을 위하여 개인정보를 처리합니다.</p>
         <ul>
-          <li>서비스 제공 및 이용자 식별, 카카오 로그인 연동, 본인확인</li>
+          <li>서비스 제공 및 이용자 식별, 본인확인</li>
           <li>유료결제 처리, 결제내역 확인, 환불 처리, 고객문의 대응</li>
           <li>서비스 이용기록 분석, 부정이용 방지, 보안 및 안정성 확보</li>
           <li>(선택) 마케팅·광고성 정보 제공 및 이벤트 운영</li>
@@ -21,10 +21,9 @@ export default function Privacy() {
       <Section title="2. 처리하는 개인정보의 항목">
         <p>회사는 서비스 제공에 필요한 최소한의 개인정보를 처리합니다.</p>
 
-        <p className="mt-3 font-medium text-text/80">카카오 로그인(외부계정 연동) 시</p>
+        <p className="mt-3 font-medium text-text/80">서비스 이용 시</p>
         <ul>
-          <li>(필수) 카카오 고유 식별자(회원번호/연동키 등)</li>
-          <li>(선택) 닉네임(또는 표시명), 프로필 이미지, 이메일, 성별, 생일/출생연도 등 카카오 동의 화면에서 이용자가 선택 동의한 항목(제공되는 경우에 한함)</li>
+          <li>(필수) 이메일, 닉네임, 생년월일, 출생시간, 출생지</li>
         </ul>
 
         <p className="mt-3 font-medium text-text/80">유료결제 및 환불 처리 시</p>
@@ -49,7 +48,7 @@ export default function Privacy() {
       <Section title="3. 개인정보의 처리 및 보유기간">
         <p>회사는 원칙적으로 개인정보 처리 목적이 달성되면 지체 없이 파기합니다. 다만, 관계 법령에 따라 보존할 필요가 있는 경우 해당 기간 동안 보관할 수 있습니다.</p>
         <ul>
-          <li>서비스 이용(계정 연동) 정보: 회원 탈퇴(연동 해제) 시까지</li>
+          <li>서비스 이용 정보: 회원 탈퇴 시까지</li>
           <li>결제 및 거래내역: 관련 법령에 따른 보존기간 또는 분쟁 해결을 위한 필요기간 동안 보관</li>
           <li>고객문의/분쟁처리 기록: 처리 완료 후 관련 법령 또는 내부 기준에 따른 기간 보관</li>
           <li>마케팅 수신동의 정보(선택): 동의 철회 또는 회원 탈퇴 시까지</li>
@@ -67,8 +66,7 @@ export default function Privacy() {
       <Section title="5. 개인정보 처리의 위탁">
         <p>회사는 서비스 제공을 위해 다음과 같은 업무를 외부에 위탁할 수 있으며, 위탁 시 수탁자가 개인정보를 안전하게 처리하도록 계약 등 필요한 조치를 합니다.</p>
         <ul>
-          <li>결제 처리 및 환불: [PG사명 — 추후 기재]</li>
-          <li>카카오 로그인 인증(외부계정): 카카오(주)</li>
+          <li>결제 처리 및 환불: 포트원(PortOne)</li>
           <li>클라우드/서버 호스팅: Supabase, Inc. / Cloudflare, Inc.</li>
           <li>고객지원 도구(문의/메일 발송 등): [업체명 — 추후 기재]</li>
         </ul>
@@ -98,9 +96,9 @@ export default function Privacy() {
 
       <Section title="10. 개인정보 보호책임자 및 문의처">
         <ul>
-          <li>개인정보 보호책임자: 안경진</li>
-          <li>연락처: [미기재 — 추후 등록 예정]</li>
-          <li>고객센터: [미기재 — 추후 등록 예정]</li>
+          <li>개인정보 보호책임자: 송산해</li>
+          <li>연락처: contact@questionperday.me</li>
+          <li>고객센터: contact@questionperday.me</li>
         </ul>
       </Section>
 
@@ -110,7 +108,7 @@ export default function Privacy() {
 
       <section className="mt-12 pt-8 border-t border-border">
         <p className="text-sm text-text-muted">시행일: 2026년 4월 1일</p>
-        <p className="text-sm text-text-muted mt-1">사업자: 숨숨 · 대표자: 안경진 · 사업자등록번호: 140-44-01387</p>
+        <p className="text-sm text-text-muted mt-1">사업자: 하우워즈 · 대표자: 송산해 · 사업자등록번호: 413-24-01458</p>
       </section>
     </main>
   )
