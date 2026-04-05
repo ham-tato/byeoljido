@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useChartStore } from '@/stores/chartStore'
 import { calculateChart } from '@/lib/astro'
+import { supabase } from '@/lib/supabase'
+import { generateCode } from '@/lib/generateCode'
+import { generateReading } from '@/lib/generateReading'
 import CitySearch from '@/components/CitySearch'
 import type { City } from '@/stores/chartStore'
 
@@ -87,7 +90,7 @@ export default function InputForm() {
     setError('')
 
     // 로딩 연출을 위한 딜레이 (5초)
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         const input = {
           nickname: nickname.trim(),
@@ -107,10 +110,22 @@ export default function InputForm() {
 
         setInput(input)
         setChart(chart)
-        // sessionStorage에 결과 저장 (탭별 독립)
-        const resultId = Date.now().toString(36)
-        sessionStorage.setItem(`byeoljido_result_${resultId}`, JSON.stringify({ input, chart }))
-        navigate(`/result?id=${resultId}`)
+
+        // reading 생성 + Supabase에 결과 저장
+        const reading = generateReading(chart, input.nickname)
+        const code = generateCode()
+        const { error: insertError } = await supabase
+          .from('results')
+          .insert({ id: code, input, chart, reading })
+
+        if (insertError) {
+          console.error('결과 저장 실패:', insertError)
+          setError('결과 저장 중 오류가 발생했습니다. 다시 시도해주세요.')
+          setIsLoading(false)
+          return
+        }
+
+        navigate(`/result/${code}`)
       } catch (err) {
         console.error('Chart calculation error:', err)
         setError('차트 계산 중 오류가 발생했습니다. 입력 정보를 확인해주세요.')

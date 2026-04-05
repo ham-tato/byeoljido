@@ -23,7 +23,7 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/intro" element={<Intro />} />
         <Route path="/input" element={<InputForm />} />
-        <Route path="/result" element={<Result />} />
+        <Route path="/result/:code" element={<Result />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
       </Routes>
