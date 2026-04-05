@@ -1,5 +1,6 @@
 import * as PortOne from '@portone/browser-sdk/v2'
-import type { PayMethod } from '@/components/PaywallOverlay'
+
+export type PayMethod = 'kakaopay' | 'tosspay'
 
 const STORE_ID = import.meta.env.VITE_PORTONE_STORE_ID || ''
 const CHANNEL_KEY_KAKAOPAY = import.meta.env.VITE_PORTONE_CHANNEL_KAKAOPAY || ''

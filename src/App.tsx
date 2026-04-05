@@ -7,6 +7,7 @@ const InputForm = lazy(() => import('@/pages/InputForm'))
 const Result = lazy(() => import('@/pages/Result'))
 const Terms = lazy(() => import('@/pages/Terms'))
 const Privacy = lazy(() => import('@/pages/Privacy'))
+const Payment = lazy(() => import('@/pages/Payment'))
 
 function Loading() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/intro" element={<Intro />} />
         <Route path="/input" element={<InputForm />} />
         <Route path="/result/:code" element={<Result />} />
+        <Route path="/payment/:code" element={<Payment />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
       </Routes>

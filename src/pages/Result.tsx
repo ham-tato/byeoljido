@@ -7,8 +7,6 @@ import type { BirthInput } from '@/stores/chartStore'
 import NightSky from '@/components/NightSky'
 import TextRenderer from '@/components/TextRenderer'
 import LifeCycleGraph from '@/components/LifeCycleGraph'
-import PaywallOverlay from '@/components/PaywallOverlay'
-import type { PayMethod } from '@/components/PaywallOverlay'
 
 // ─── 미리보기 타입 ───
 interface PreviewSection {
@@ -123,7 +121,6 @@ export default function Result() {
   const [preview, setPreview] = useState<PreviewSection[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
-  const [purchasing, setPurchasing] = useState(false)
 
   // ── 데이터 조회 ──
   useEffect(() => {
@@ -169,37 +166,6 @@ export default function Result() {
       setTimeout(() => setCopied(false), 2500)
     }
   }, [code, input])
-
-  // ── 결제 ──
-  const handlePurchase = useCallback(async (method: PayMethod) => {
-    setPurchasing(true)
-    try {
-      const { requestPayment } = await import('@/lib/payment')
-      const paymentId = await requestPayment(code!, method)
-      if (!paymentId) { setPurchasing(false); return }
-
-      const res = await fetch('/api/payment/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, paymentId }),
-      })
-
-      if (!res.ok) throw new Error('결제 검증 실패')
-
-      // 전체 데이터 다시 조회
-      const fullRes = await fetch(`/api/result/${code}`)
-      const fullData = await fullRes.json()
-      setInput(fullData.input)
-      setReading(fullData.reading)
-      setPaid(true)
-      setPreview(null)
-    } catch (err) {
-      console.error('결제 오류:', err)
-      alert('결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.')
-    } finally {
-      setPurchasing(false)
-    }
-  }, [code])
 
   // ── 로딩 / 가드 ──
   if (loading) {
@@ -444,9 +410,29 @@ export default function Result() {
         </section>
       )}
 
-      {/* 페이월 오버레이 */}
-      <section className="px-8">
-        <PaywallOverlay onPurchase={handlePurchase} loading={purchasing} />
+      {/* 결제 CTA */}
+      <section className="px-8 mt-8">
+        <div className="relative">
+          {/* 블러 배경 */}
+          <div className="select-none pointer-events-none" style={{ filter: 'blur(8px)' }} aria-hidden>
+            <p className="text-[15px] text-text/75 leading-[1.9]">
+              당신의 별지도에 담긴 이야기가 여기 이어집니다. 태어난 순간의 하늘이 들려주는 메시지를 확인해보세요. 별들의 배치가 말하는 당신만의 고유한 패턴과 흐름이 기다리고 있습니다.
+            </p>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <button
+              onClick={() => navigate(`/payment/${code}`)}
+              className="px-8 py-3.5 text-sm font-sans tracking-wider cursor-pointer transition-all duration-300"
+              style={{
+                background: 'linear-gradient(135deg, #9A7B1A 0%, #C5A028 50%, #e2c96a 100%)',
+                color: '#fff',
+                boxShadow: '0 4px 20px rgba(197,160,40,0.3)',
+              }}
+            >
+              1,900원에 전체 별지도 열기
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* 미리보기 섹션 제목들 */}
