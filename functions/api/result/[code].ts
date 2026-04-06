@@ -1,4 +1,3 @@
-import { extractPreview } from '../../shared/reading'
 import type { FullReading } from '../../shared/reading'
 
 interface Env {
@@ -37,14 +36,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   const row = rows[0]
 
-  if (row.paid) {
-    return new Response(JSON.stringify({ paid: true, input: row.input, reading: row.reading }), {
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-  const preview = extractPreview(row.reading)
-  return new Response(JSON.stringify({ paid: false, input: row.input, preview }), {
+  return new Response(JSON.stringify({ paid: row.paid, input: row.input, reading: row.reading }), {
     headers: { 'Content-Type': 'application/json' },
   })
 }

@@ -8,12 +8,20 @@ import NightSky from '@/components/NightSky'
 import TextRenderer from '@/components/TextRenderer'
 import LifeCycleGraph from '@/components/LifeCycleGraph'
 
-// ─── 미리보기 타입 ───
-interface PreviewSection {
-  chapter: string
-  title: string
-  subtitle?: string
-  firstSentence: string
+// ─── 미리보기 래퍼 ───
+function PreviewClip({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="relative overflow-hidden"
+      style={{
+        maxHeight: '260px',
+        WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
+        maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
+      }}
+    >
+      {children}
+    </div>
+  )
 }
 
 // ─── 내부 컴포넌트 (기존 유지) ───
@@ -118,7 +126,6 @@ export default function Result() {
   const [paid, setPaid] = useState(false)
   const [input, setInput] = useState<BirthInput | null>(null)
   const [reading, setReading] = useState<Reading | null>(null)
-  const [preview, setPreview] = useState<PreviewSection[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
 
@@ -134,10 +141,8 @@ export default function Result() {
       .then((data) => {
         setInput(data.input)
         setPaid(data.paid)
-        if (data.paid && data.reading) {
+        if (data.reading) {
           setReading(data.reading)
-        } else if (data.preview) {
-          setPreview(data.preview)
         }
         setLoading(false)
       })
@@ -385,10 +390,37 @@ export default function Result() {
   }
 
   // ═══════════════════════════════════════
-  //  미결제 — 미리보기 렌더링
+  //  미결제 — 20% 미리보기 렌더링
   // ═══════════════════════════════════════
-  const prologuePreview = preview?.find(s => s.chapter === 'prologue')
-  const sectionPreviews = preview?.filter(s => s.chapter !== 'prologue') ?? []
+
+  // 결제 CTA 버튼
+  const paymentCta = (
+    <div className="flex justify-center py-8">
+      <button
+        onClick={() => navigate(`/payment/${code}`)}
+        className="px-8 py-3.5 text-sm font-sans tracking-wider cursor-pointer transition-all duration-300"
+        style={{
+          background: 'linear-gradient(135deg, #9A7B1A 0%, #C5A028 50%, #e2c96a 100%)',
+          color: '#fff',
+          boxShadow: '0 4px 20px rgba(197,160,40,0.3)',
+        }}
+      >
+        1,900원에 전체 별지도 열기
+      </button>
+    </div>
+  )
+
+  // reading 없으면 fallback
+  if (!reading) {
+    return (
+      <main className="max-w-lg mx-auto pb-32">
+        {headerEl}
+        {nightSkyEl}
+        {paymentCta}
+        {footerButtons}
+      </main>
+    )
+  }
 
   return (
     <main className="max-w-lg mx-auto pb-32">
@@ -398,59 +430,157 @@ export default function Result() {
 
       <Ornament />
 
-      {/* 프롤로그 첫 문장 */}
-      {prologuePreview && (
-        <section className="px-8 mb-4">
-          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Prologue</p>
-          <h2 className="text-2xl font-serif text-text mb-2">{prologuePreview.title}</h2>
-          {prologuePreview.subtitle && (
-            <p className="text-sm text-text-muted italic mb-6">{prologuePreview.subtitle}</p>
-          )}
-          <p className="text-[15px] text-text/75 leading-[1.9]">{prologuePreview.firstSentence}</p>
-        </section>
-      )}
-
-      {/* 결제 CTA */}
-      <section className="px-8 mt-8">
-        <div className="relative">
-          {/* 블러 배경 */}
-          <div className="select-none pointer-events-none" style={{ filter: 'blur(8px)' }} aria-hidden>
-            <p className="text-[15px] text-text/75 leading-[1.9]">
-              당신의 별지도에 담긴 이야기가 여기 이어집니다. 태어난 순간의 하늘이 들려주는 메시지를 확인해보세요. 별들의 배치가 말하는 당신만의 고유한 패턴과 흐름이 기다리고 있습니다.
-            </p>
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <button
-              onClick={() => navigate(`/payment/${code}`)}
-              className="px-8 py-3.5 text-sm font-sans tracking-wider cursor-pointer transition-all duration-300"
-              style={{
-                background: 'linear-gradient(135deg, #9A7B1A 0%, #C5A028 50%, #e2c96a 100%)',
-                color: '#fff',
-                boxShadow: '0 4px 20px rgba(197,160,40,0.3)',
-              }}
-            >
-              1,900원에 전체 별지도 열기
-            </button>
-          </div>
-        </div>
+      {/* 프롤로그 — 20% 미리보기 */}
+      <section className="px-8 mb-4">
+        <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Prologue</p>
+        <h2 className="text-2xl font-serif text-text mb-2">당신이 태어나던 순간의 하늘</h2>
+        <p className="text-sm text-text-muted italic mb-8">{reading.chartSummary.title}</p>
+        <PreviewClip>
+          <BodyText text={reading.chartSummary.body} />
+        </PreviewClip>
       </section>
 
-      {/* 미리보기 섹션 제목들 */}
-      {sectionPreviews.length > 0 && (
-        <section className="px-8 mt-16">
-          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-6 font-display">
-            Chapters
-          </p>
-          <div className="space-y-6">
-            {sectionPreviews.map((s) => (
-              <div key={s.chapter} className="border-l border-gold/30 pl-4">
-                <h3 className="text-lg font-serif text-text mb-1">{s.title}</h3>
-                <p className="text-[13px] text-text-muted/60 leading-relaxed">{s.firstSentence}</p>
+      {paymentCta}
+
+      <Ornament />
+
+      {/* Part One — 타고난 기본 성향 */}
+      <section className="px-8">
+        <div className="text-center mb-20">
+          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Part One</p>
+          <h2 className="text-3xl font-serif text-text mb-2">타고난 기본 성향</h2>
+          <p className="text-sm text-text-muted">당신의 자아, 감정, 그리고 첫인상을 결정하는 세 개의 기둥</p>
+        </div>
+        {basicSections.map((section, i) => (
+          <div key={section.id} className="mb-24">
+            <div className="mb-10">
+              <span className="chapter-num text-6xl">{romanNumerals[i]}</span>
+              <h3 className="text-2xl font-serif text-text mt-3 mb-2">{section.title}</h3>
+              {section.subtitle && (
+                <p className="text-[15px] text-text-muted leading-relaxed italic">— {section.subtitle}</p>
+              )}
+            </div>
+            <PreviewClip>
+              <div className="border-l border-gold/40 pl-4 mb-8">
+                {section.badges && section.badges.length > 0 && (
+                  <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3">
+                    {section.badges.map((b, j) => <BadgeItem key={j} badge={b} />)}
+                  </div>
+                )}
+                <p className="text-[13px] text-text-muted/70 leading-relaxed italic">{section.starMovement}</p>
               </div>
-            ))}
+              <BodyText text={section.body} />
+            </PreviewClip>
           </div>
-        </section>
-      )}
+        ))}
+      </section>
+
+      {paymentCta}
+
+      <Ornament />
+
+      {/* Part Two — 빛과 그림자 */}
+      <section className="px-8">
+        <div className="text-center mb-20">
+          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Part Two</p>
+          <h2 className="text-3xl font-serif text-text mb-2">빛과 그림자</h2>
+          <p className="text-sm text-text-muted">당신이 타고난 매력, 숨겨진 재능, 그리고 넘어야 할 벽</p>
+        </div>
+        {otherSections.filter(s => ['strengths', 'hiddenTalent', 'challenges'].includes(s.id)).map((section, i) => (
+          <div key={section.id} className="mb-24">
+            <div className="mb-10">
+              <span className="chapter-num text-6xl">{romanNumerals[i + 3]}</span>
+              <h3 className="text-2xl font-serif text-text mt-3 mb-2">{section.title}</h3>
+              {section.subtitle && (
+                <p className="text-[15px] text-text-muted leading-relaxed italic">— {section.subtitle}</p>
+              )}
+            </div>
+            <PreviewClip>
+              <div className="border-l border-gold/40 pl-4 mb-8">
+                {section.badges && section.badges.length > 0 && (
+                  <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3">
+                    {section.badges.map((b, j) => <BadgeItem key={j} badge={b} />)}
+                  </div>
+                )}
+                <p className="text-[13px] text-text-muted/70 leading-relaxed italic">{section.starMovement}</p>
+              </div>
+              <BodyText text={section.body} />
+            </PreviewClip>
+          </div>
+        ))}
+      </section>
+
+      {paymentCta}
+
+      <Ornament />
+
+      {/* Part Three — 사랑과 운명 */}
+      <section className="px-8">
+        <div className="text-center mb-20">
+          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Part Three</p>
+          <h2 className="text-3xl font-serif text-text mb-2">사랑과 운명</h2>
+          <p className="text-sm text-text-muted">당신의 연애 방식과 운명이 이끄는 상대</p>
+        </div>
+        {otherSections.filter(s => ['love', 'destinedPartner'].includes(s.id)).map((section, i) => (
+          <div key={section.id} className="mb-24">
+            <div className="mb-10">
+              <span className="chapter-num text-6xl">{romanNumerals[i + 6]}</span>
+              <h3 className="text-2xl font-serif text-text mt-3 mb-2">{section.title}</h3>
+              {section.subtitle && (
+                <p className="text-[15px] text-text-muted leading-relaxed italic">— {section.subtitle}</p>
+              )}
+            </div>
+            <PreviewClip>
+              <div className="border-l border-gold/40 pl-4 mb-8">
+                {section.badges && section.badges.length > 0 && (
+                  <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3">
+                    {section.badges.map((b, j) => <BadgeItem key={j} badge={b} />)}
+                  </div>
+                )}
+                <p className="text-[13px] text-text-muted/70 leading-relaxed italic">{section.starMovement}</p>
+              </div>
+              <BodyText text={section.body} />
+            </PreviewClip>
+          </div>
+        ))}
+      </section>
+
+      {paymentCta}
+
+      <Ornament />
+
+      {/* Part Four — 항해의 방향 */}
+      <section className="px-8">
+        <div className="text-center mb-20">
+          <p className="text-[10px] text-text-muted tracking-[0.25em] uppercase mb-3 font-display">Part Four</p>
+          <h2 className="text-3xl font-serif text-text mb-2">항해의 방향</h2>
+          <p className="text-sm text-text-muted">직업적 성취와 이번 생의 여정이 향하는 곳</p>
+        </div>
+        {otherSections.filter(s => ['career', 'lifeDirection'].includes(s.id)).map((section, i) => (
+          <div key={section.id} className="mb-24">
+            <div className="mb-10">
+              <span className="chapter-num text-6xl">{romanNumerals[i + 8]}</span>
+              <h3 className="text-2xl font-serif text-text mt-3 mb-2">{section.title}</h3>
+              {section.subtitle && (
+                <p className="text-[15px] text-text-muted leading-relaxed italic">— {section.subtitle}</p>
+              )}
+            </div>
+            <PreviewClip>
+              <div className="border-l border-gold/40 pl-4 mb-8">
+                {section.badges && section.badges.length > 0 && (
+                  <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3">
+                    {section.badges.map((b, j) => <BadgeItem key={j} badge={b} />)}
+                  </div>
+                )}
+                <p className="text-[13px] text-text-muted/70 leading-relaxed italic">{section.starMovement}</p>
+              </div>
+              <BodyText text={section.body} />
+            </PreviewClip>
+          </div>
+        ))}
+      </section>
+
+      {paymentCta}
 
       {footerButtons}
     </main>
